@@ -1,0 +1,327 @@
+import Link from 'next/link'
+import Footer from '@/components/Footer'
+import { getSEOContent } from '@/lib/seo-content'
+import RelatedServices from '@/components/RelatedServices'
+import { CallBtn, FloatingCallBtn, NavbarCallBtn } from '@/components/CallBtn'
+import CoverageStats from '@/components/CoverageStats'
+import Breadcrumb from '@/components/Breadcrumb'
+
+interface ServicePageProps {
+    city: string
+    state: string
+    stateCode: string
+}
+
+export default function ServicePage({ city, state, stateCode }: ServicePageProps) {
+    const formattedCity = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+    const formattedState = state.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
+    // Generate Dynamic SEO Content
+    const content = getSEOContent(formattedCity, formattedState)
+
+    return (
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-orange-500 selection:text-white">
+
+            {/* Navigation (Transparent Glass) */}
+            <nav className="fixed w-full z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                    <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
+                        GutterPro
+                    </Link>
+                    <div className="flex items-center gap-6">
+                        <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                            <Link href="/" className="hover:text-blue-600 transition-colors">Locations</Link>
+                            <Link href="/about" className="hover:text-blue-600 transition-colors">About</Link>
+                            <Link href="/contact" className="hover:text-blue-600 transition-colors">Contact</Link>
+                        </div>
+                        <NavbarCallBtn />
+                    </div>
+                </div>
+            </nav>
+
+            {/* Hero Section */}
+            <header className="relative pt-32 pb-24 px-6 overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-900 via-slate-900 to-black opacity-95"></div>
+                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                    <div className="absolute top-48 -left-24 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                </div>
+
+                <div className="relative z-10 max-w-5xl mx-auto text-center">
+                    <div className="inline-block px-4 py-1.5 mb-6 rounded-full border border-blue-400/30 bg-blue-500/10 backdrop-blur-sm text-blue-300 text-sm font-semibold uppercase tracking-wider">
+                        #1 Rated in {stateCode.toUpperCase()}
+                    </div>
+                    <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight">
+                        Premium Gutter Installation in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}</span>
+                    </h1>
+                    <div className="text-xl md:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto font-light space-y-4">
+                        <p dangerouslySetInnerHTML={{ __html: content.intro.replace(/\*\*(.*?)\*\*/g, '<span class="text-white font-medium">$1</span>') }} />
+                    </div>
+
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <CallBtn className="py-4 px-10 text-lg w-full sm:w-auto transform hover:scale-105" label="Call Now for Fast Quote" />
+                        <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold py-4 px-10 rounded-full text-lg transition-all w-full sm:w-auto">
+                            View Services
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <Breadcrumb items={[
+                { label: state, href: `/${stateCode}` },
+                { label: formattedCity, href: `/${stateCode}/${city}` }
+            ]} />
+
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "HomeAndConstructionBusiness",
+                        "name": `GutterPro ${formattedCity}`,
+                        "image": "https://gutterpro.com/og-image.jpg",
+                        "url": `https://gutterpro.com/${stateCode}/${city}`,
+                        "telephone": "+18588985338",
+                        "address": {
+                            "@type": "PostalAddress",
+                            "addressLocality": formattedCity,
+                            "addressRegion": stateCode,
+                            "addressCountry": "US"
+                        },
+                        "geo": {
+                            "@type": "GeoCircle",
+                            "geoMidpoint": {
+                                "@type": "GeoCoordinates",
+                                "latitude": "37.0902",
+                                "longitude": "-95.7129"
+                            },
+                            "geoRadius": "50000"
+                        },
+                        "priceRange": "$$",
+                        "openingHoursSpecification": [
+                            {
+                                "@type": "OpeningHoursSpecification",
+                                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                                "opens": "07:00",
+                                "closes": "20:00"
+                            }
+                        ]
+                    })
+                }}
+            />
+
+            <CoverageStats />
+            <CoverageStats />
+            <RelatedServices city={formattedCity} state={stateCode} />
+
+            {/* Features Grid */}
+            <section className="py-24 px-6 bg-white relative z-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid md:grid-cols-3 gap-8 -mt-32">
+                        {[
+                            { title: "Seamless Technology", desc: "Custom-fit on-site to eliminate leaks and improve aesthetics.", icon: "🔧" },
+                            { title: "Gutter Guards", desc: "Advanced micro-mesh protection to keep leaves and debris out forever.", icon: "🛡️" },
+                            { title: "Lifetime Warranty", desc: "We stand behind our materials and craftsmanship 100%.", icon: "✅" }
+                        ].map((feature, i) => (
+                            <div key={i} className="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 hover:border-blue-100 transition-all hover:-translate-y-1">
+                                <div className="text-4xl mb-4">{feature.icon}</div>
+                                <h3 className="text-xl font-bold mb-3 text-slate-800">{feature.title}</h3>
+                                <p className="text-slate-600 leading-relaxed">{feature.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Local Content Section */}
+            <section className="py-20 px-6 bg-slate-50">
+                <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                            Why {formattedCity} Homeowners Trust Us
+                        </h2>
+                        <div className="text-lg text-slate-600 mb-6 leading-relaxed space-y-4">
+                            <p dangerouslySetInnerHTML={{ __html: content.whyChoose.replace(/\*\*(.*?)\*\*/g, '<span class="text-slate-900 font-semibold">$1</span>') }} />
+                            <p dangerouslySetInnerHTML={{ __html: content.materials.replace(/\*\*(.*?)\*\*/g, '<span class="text-slate-900 font-semibold">$1</span>') }} />
+                        </div>
+                        <ul className="space-y-4 mb-8">
+                            {['Licensed & Insured in ' + stateCode.toUpperCase(), '5-Star Google Rated', 'Same-Day Quotes Available'].map((item, i) => (
+                                <li key={i} className="flex items-center text-slate-700 font-medium">
+                                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-sm">✓</span>
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+
+                        {/* Dynamic Map Placeholder */}
+                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                            <p className="text-sm text-blue-800 font-semibold mb-1">Service Area Coverage</p>
+                            <div className="text-blue-600">
+                                We cover all neighborhoods in <span className="underline">{formattedCity}</span> and surrounding {stateCode.toUpperCase()} counties.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-3xl transform rotate-3 opacity-20"></div>
+                        <div className="relative bg-white p-2 rounded-3xl shadow-2xl">
+                            <div className="aspect-[4/3] bg-slate-200 rounded-2xl flex items-center justify-center overflow-hidden">
+                                {/* Placeholder for local image */}
+                                <div className="text-center p-8">
+                                    <span className="text-6xl mb-4 block">🏠</span>
+                                    <p className="text-slate-400 font-medium">Project Gallery: {formattedCity}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Services Detailed Section */}
+            <section className="py-24 px-6 bg-slate-50">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                            Complete Gutter Solutions in {formattedCity}
+                        </h2>
+                        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                            {content.serviceDesc.replace(/\*\*(.*?)\*\*/g, '$1')}
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                        {[
+                            {
+                                title: "Seamless Gutter Installation",
+                                desc: "Custom-fabricated on-site to fit your home perfectly. No seams means no leaks. Available in aluminum, copper, and steal.",
+                                bg: "bg-blue-50", text: "text-blue-600"
+                            },
+                            {
+                                title: "Gutter Guards & Protection",
+                                desc: "Stop cleaning your gutters forever. We install premium micro-mesh guards that block pine needles, leaves, and roof grit.",
+                                bg: "bg-green-50", text: "text-green-600"
+                            },
+                            {
+                                title: "Gutter Repair & Realignment",
+                                desc: "Fixing sagging, leaking, or detached gutters. We replace hangers, reseal corners, and adjust pitch for proper flow.",
+                                bg: "bg-orange-50", text: "text-orange-600"
+                            },
+                            {
+                                title: "Downspout Extensions",
+                                desc: "Protect your foundation by moving water away from your home. We install buried drains and strategic extensions.",
+                                bg: "bg-purple-50", text: "text-purple-600"
+                            }
+                        ].map((service, i) => (
+                            <div key={i} className="flex gap-6 p-8 rounded-2xl bg-white border border-slate-100 hover:shadow-xl transition-shadow group">
+                                <div className={`w-16 h-16 rounded-xl ${service.bg} ${service.text} flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform`}>
+                                    {['🏠', '🛡️', '🔧', '💧'][i]}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
+                                    <p className="text-slate-600 leading-relaxed">{service.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Our Process Section */}
+            <section className="py-24 px-6 bg-white">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                            How It Works
+                        </h2>
+                        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                            {content.processIntro}
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-12 relative">
+                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -z-10 hidden md:block"></div>
+
+                        {[
+                            { step: "01", title: "Request Quote", desc: "Fill out our simple form. We'll contact you within 24 hours to schedule a quick measurement." },
+                            { step: "02", title: "Custom Fabrication", desc: "We arrive with our rolling gutter machine and craft your gutters right in your driveway." },
+                            { step: "03", title: "Professional Install", desc: "Most jobs are completed in just one day. We clean up thoroughly and haul away old materials." }
+                        ].map((step, i) => (
+                            <div key={i} className="bg-white p-8 pt-0 text-center">
+                                <div className="w-20 h-20 mx-auto bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg shadow-blue-200 mb-8 relative z-10">
+                                    {step.step}
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-4">{step.title}</h3>
+                                <p className="text-slate-600">{step.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="py-24 px-6 bg-slate-50">
+                <div className="max-w-4xl mx-auto">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Frequently Asked Questions in {formattedCity}</h2>
+
+                    <div className="space-y-4">
+                        {[
+                            { q: "How much does gutter installation cost?", a: content.faqAnswers.cost },
+                            { q: "Do you offer warranties?", a: "Yes! We offer a lifetime warranty on materials and a comprehensive labor warranty on all installations." },
+                            { q: "Can you install gutters on any roof type?", a: "Absolutely. We have experience with asphalt shingles, metal roofs, slate, tile, and flat roofs." },
+                            { q: "How quickly can you get the job done?", a: content.faqAnswers.timeline }
+                        ].map((faq, i) => (
+                            <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">{faq.q}</h3>
+                                <p className="text-slate-600">{faq.a}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Testimonials Section (Social Proof) */}
+            <section className="py-24 px-6 bg-slate-50 border-t border-slate-200">
+                <div className="max-w-7xl mx-auto">
+                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 text-center">
+                        What Neighbors in {formattedCity} Are Saying
+                    </h2>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            { name: "Michael R.", role: "Homeowner", text: "They came out the next day for a quote and installed everything on Saturday. Super clean work.", stars: 5 },
+                            { name: "Sarah J.", role: "Local Resident", text: "I was worried about the cost, but their quote was significantly lower than the other two I got. Highly recommend.", stars: 5 },
+                            { name: "David K.", role: "Business Owner", text: "Professional from start to finish. The seamless gutters look amazing on my Victorian home.", stars: 5 }
+                        ].map((review, i) => (
+                            <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex text-yellow-400 mb-4">
+                                    {[...Array(review.stars)].map((_, i) => <span key={i}>★</span>)}
+                                </div>
+                                <p className="text-slate-600 mb-6 italic">"{review.text}"</p>
+                                <div>
+                                    <div className="font-bold text-slate-900">{review.name}</div>
+                                    <div className="text-sm text-slate-500">{review.role}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="py-24 px-6 bg-slate-900 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+                <div className="max-w-4xl mx-auto text-center relative z-10">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
+                        Ready to upgrade your home in {formattedCity}?
+                    </h2>
+                    <p className="text-blue-200 text-xl mb-10 max-w-2xl mx-auto">
+                        Get a comprehensive quote in minutes. No obligation, just honest expert advice.
+                    </p>
+                    <CallBtn className="py-4 px-12 text-xl" label={`Call Now in ${formattedCity}`} />
+                </div>
+            </section>
+
+            <Footer />
+        </div>
+    )
+}
