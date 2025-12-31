@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import Footer from '@/components/Footer'
 import RelatedServices from '@/components/RelatedServices'
+import TrustBadges from '@/components/TrustBadges'
 import { Metadata } from 'next'
 
 export const revalidate = 86400 // Revalidate daily
@@ -229,6 +230,7 @@ export default async function Home() {
 
       </main>
 
+      <TrustBadges />
       <Footer />
     </div>
   )

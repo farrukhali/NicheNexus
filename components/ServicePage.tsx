@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Footer from '@/components/Footer'
 import { getSEOContent } from '@/lib/seo-content'
 import RelatedServices from '@/components/RelatedServices'
+import TrustBadges from '@/components/TrustBadges'
 import { CallBtn, FloatingCallBtn, NavbarCallBtn } from '@/components/CallBtn'
 import CoverageStats from '@/components/CoverageStats'
 import Breadcrumb from '@/components/Breadcrumb'
@@ -25,8 +26,8 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
     const formattedCity = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     const formattedState = state.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
-    // Generate Dynamic SEO Content
-    const content = getSEOContent(formattedCity, formattedState)
+    // Generate Dynamic SEO Content with state code for climate-specific messaging
+    const content = getSEOContent(formattedCity, formattedState, stateCode)
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-orange-500 selection:text-white">
@@ -173,6 +174,19 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                             <p dangerouslySetInnerHTML={{ __html: content.whyChoose.replace(/\*\*(.*?)\*\*/g, '<span class="text-slate-900 font-semibold">$1</span>') }} />
                             <p dangerouslySetInnerHTML={{ __html: content.materials.replace(/\*\*(.*?)\*\*/g, '<span class="text-slate-900 font-semibold">$1</span>') }} />
                         </div>
+
+                        {/* Technical Specs Box */}
+                        <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 mb-4">
+                            <p className="text-sm text-slate-700 font-semibold mb-1">📐 Technical Specifications</p>
+                            <p className="text-sm text-slate-600" dangerouslySetInnerHTML={{ __html: content.technicalSpecs.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                        </div>
+
+                        {/* Climate Considerations */}
+                        <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 mb-6">
+                            <p className="text-sm text-amber-800 font-semibold mb-1">🌤️ {stateCode.toUpperCase()} Climate Considerations</p>
+                            <p className="text-sm text-amber-700">{content.climateConsiderations}</p>
+                        </div>
+
                         <ul className="space-y-4 mb-8">
                             {['Licensed & Insured in ' + stateCode.toUpperCase(), '5-Star Google Rated', 'Same-Day Quotes Available'].map((item, i) => (
                                 <li key={i} className="flex items-center text-slate-700 font-medium">
@@ -439,6 +453,7 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 </div>
             </section>
 
+            <TrustBadges />
             <Footer />
         </div>
     )
