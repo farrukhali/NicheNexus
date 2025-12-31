@@ -35,7 +35,7 @@ export function CallBtn({
 
 export function FloatingCallBtn() {
     return (
-        <div className="fixed bottom-6 right-6 z-50 md:hidden animate-bounce-slow">
+        <div className="fixed bottom-6 right-6 z-50 animate-bounce-slow">
             <a
                 href={PHONE_HREF}
                 className="flex items-center gap-3 bg-red-600 text-white px-6 py-4 rounded-full shadow-2xl border-4 border-white/20 font-bold text-lg"

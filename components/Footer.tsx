@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { PHONE_NUMBER, PHONE_HREF } from './CallBtn'
 
 export default function Footer() {
     const currentYear = new Date().getFullYear()
@@ -9,7 +10,10 @@ export default function Footer() {
                 <div className="grid md:grid-cols-4 gap-8 mb-8">
                     <div>
                         <h4 className="text-white font-bold text-lg mb-4">US Gutter Installation</h4>
-                        <p className="text-sm">America&apos;s trusted gutter installation partner. Connecting homeowners with local experts nationwide.</p>
+                        <p className="text-sm mb-4">America&apos;s trusted gutter installation partner. Connecting homeowners with local experts nationwide.</p>
+                        <a href={PHONE_HREF} className="text-xl font-bold text-white hover:text-red-500 transition-colors flex items-center gap-2">
+                            📞 {PHONE_NUMBER}
+                        </a>
                     </div>
                     <div>
                         <h4 className="text-white font-bold text-lg mb-4">Quick Links</h4>

@@ -37,6 +37,15 @@ export async function generateMetadata(props: StatePageProps): Promise<Metadata>
     return {
         title: `Gutter Installation ${stateCode} | US Gutter Installation`,
         description: `Find top-rated gutter installation services in ${stateCode}. Select your city to get a free quote today.`,
+        alternates: {
+            canonical: `/${stateCode}`
+        },
+        openGraph: {
+            title: `Gutter Installation in ${stateCode} | Local Experts`,
+            description: `Connect with trusted gutter installers in ${stateCode}. Seamless gutters, guards, and repairs. Get a free quote now.`,
+            url: `https://usgutterinstallation.com/${stateCode}`,
+            type: 'website'
+        }
     }
 }
 

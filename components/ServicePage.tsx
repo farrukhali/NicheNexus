@@ -6,6 +6,7 @@ import RelatedServices from '@/components/RelatedServices'
 import { CallBtn, FloatingCallBtn, NavbarCallBtn } from '@/components/CallBtn'
 import CoverageStats from '@/components/CoverageStats'
 import Breadcrumb from '@/components/Breadcrumb'
+import CityMap from '@/components/CityMap'
 
 interface ServicePageProps {
     city: string
@@ -107,8 +108,8 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         "@context": "https://schema.org",
                         "@type": "HomeAndConstructionBusiness",
                         "name": `GutterPro ${formattedCity}`,
-                        "image": "https://gutterpro.com/og-image.jpg",
-                        "url": `https://gutterpro.com/${stateCode}/${city}`,
+                        "image": "https://usgutterinstallation.com/og-image.jpg",
+                        "url": `https://usgutterinstallation.com/${stateCode}/${city}`,
                         "telephone": "+18588985338",
                         "address": {
                             "@type": "PostalAddress",
@@ -182,7 +183,8 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         </ul>
 
                         {/* Dynamic Map Placeholder */}
-                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <CityMap city={formattedCity} state={stateCode} />
+                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 mt-4">
                             <p className="text-sm text-blue-800 font-semibold mb-1">Service Area Coverage</p>
                             <div className="text-blue-600">
                                 We cover all neighborhoods in <span className="underline">{formattedCity}</span> and surrounding {stateCode.toUpperCase()} counties.
