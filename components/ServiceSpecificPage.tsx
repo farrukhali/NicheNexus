@@ -92,6 +92,34 @@ export default function ServiceSpecificPage({ city, state, stateCode, service, r
                 { label: service.title, href: `/${stateCode}/${city}/${service.slug}` }
             ]} />
 
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Service",
+                        "name": `${service.title} in ${formattedCity}, ${stateCode}`,
+                        "description": service.description(formattedCity, formattedState),
+                        "provider": {
+                            "@type": "LocalBusiness",
+                            "name": "US Gutter Installation",
+                            "telephone": "+18588985338",
+                            "url": "https://usgutterinstallation.com"
+                        },
+                        "areaServed": {
+                            "@type": "City",
+                            "name": formattedCity,
+                            "containedInPlace": {
+                                "@type": "State",
+                                "name": formattedState
+                            }
+                        },
+                        "serviceType": service.title,
+                        "url": `https://usgutterinstallation.com/${stateCode}/${city}/${service.slug}`
+                    })
+                }}
+            />
+
             {/* Features Section */}
             <section className="py-20 px-6 bg-white">
                 <div className="max-w-7xl mx-auto">

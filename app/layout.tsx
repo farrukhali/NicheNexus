@@ -24,6 +24,20 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     siteName: 'US Gutter Installation',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'US Gutter Installation - Professional Gutter Services Nationwide',
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'US Gutter Installation | Professional Gutter Services',
+    description: 'America\'s #1 rated gutter installation. Seamless gutters, guards, cleaning, and repair.',
+    images: ['/og-image.jpg'],
   },
   icons: {
     icon: '/favicon.svg',

@@ -10,14 +10,14 @@ export interface ContentVars {
 
 const VARIANTS = {
     intros: [
-        (city: string, state: string) => `Homeowners in **${city}** know that protecting their property starts with a reliable roofing and gutter system. At US Gutter Installation, we specialize in seamless gutter installation designed specifically for the weather patterns of **${state}**.`,
-        (city: string, state: string) => `Living in **${city}**, effective water management is crucial for preserving your home's foundation. Our local team provides top-tier gutter replacement and installation services across **${state}**, ensuring your home stays dry year-round.`,
-        (city: string, state: string) => `Upgrade your home's curb appeal and functionality with US Gutter Installation's premium seamless gutters. Serving the **${city}, ${state}** area, we deliver custom-fit solutions that handle heavy rainfall and prevent basement flooding.`,
+        (city: string, state: string) => `Homeowners looking for **gutter installation near me in ${city}** choose US Gutter Installation for reliability and quality. We specialize in seamless combined systems designed specifically for the weather patterns of **${state}**.`,
+        (city: string, state: string) => `Living in **${city}**, finding trusted **gutter companies near me** is crucial for preserving your home's foundation. Our local team provides top-tier gutter replacement and installation services across **${state}**, ensuring your home stays dry year-round.`,
+        (city: string, state: string) => `Upgrade your home's curb appeal with the best **seamless gutters near me in ${city}, ${state}**. We deliver custom-fit solutions that handle heavy rainfall and prevent basement flooding, right in your neighborhood.`,
     ],
     serviceDescs: [
-        (city: string) => `Our **${city}** teams are equipped with on-site fabrication machines to create continuous K-style or Half-round gutters that perfectly match your home's trim.`,
-        (city: string) => `We bring the factory to your driveway in **${city}**. By custom-cutting seamless aluminum channels on-site, we eliminate leak points and ensure a flawless fit.`,
-        (city: string) => `Expertly crafted to withstand local conditions, our seamless channels provide superior drainage. We serve all neighborhoods in **${city}** with precision installation.`,
+        (city: string) => `Our **${city}** teams are equipped with on-site fabrication machines to create continuous K-style or Half-round gutters. When you search for **gutter repair near me**, you expect fast, local service, and that's exactly what we deliver.`,
+        (city: string) => `We bring the factory to your driveway in **${city}**. By custom-cutting seamless aluminum channels on-site, we eliminate leak points. proven local experts for anyone asking "where can I find gutter installation near me?".`,
+        (city: string) => `Expertly crafted to withstand local conditions, our seamless channels provide superior drainage. We serve all neighborhoods in **${city}**, making us the top choice for **gutter cleaning and installation near me**.`,
     ],
     materials: [
         "We offer a wide range of materials including durable **Aluminum** (available in 20+ colors), classic **Copper** for a premium patina, and robust **Galvanized Steel**.",
@@ -25,8 +25,8 @@ const VARIANTS = {
         "Customize your look with our material options. Go with standard **0.027 gauge Aluminum** for value, or upgrade to **0.032 gauge** or **Copper** for lifetime performance.",
     ],
     whyChoose: [
-        (city: string) => `We are not just contractors; we are your neighbors in **${city}**. We understand local building codes and common architectural styles, from historic renovations to new construction.`,
-        (city: string) => `With years of experience serving **${city}**, we've built a reputation for honesty and quality. We treat every home like our own, ensuring clean jobsites and perfect alignment.`,
+        (city: string) => `We are not just contractors; we are your neighbors in **${city}**. We understand local building codes and common architectural styles, so you get the most experienced **gutter installers near me**.`,
+        (city: string) => `With years of experience serving **${city}**, we've built a reputation for honesty and quality. If you want **gutter services near me** that treat every home like their own, look no further.`,
         (city: string) => `Local expertise matters. Our installers in **${city}** are trained to identify potential drainage issues specific to your property's grade and landscaping.`,
     ]
 }

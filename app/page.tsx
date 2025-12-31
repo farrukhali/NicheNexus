@@ -2,8 +2,22 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import Footer from '@/components/Footer'
 import RelatedServices from '@/components/RelatedServices'
+import { Metadata } from 'next'
 
 export const revalidate = 86400 // Revalidate daily
+
+export const metadata: Metadata = {
+  title: 'Gutter Installation Near Me | US Gutter Installation',
+  description: 'Find top-rated gutter installation services near you. We serve 31,000+ cities across all 50 states. Seamless gutters, guards, cleaning & repair. Get a free quote today!',
+  alternates: {
+    canonical: '/'
+  },
+  openGraph: {
+    title: 'Gutter Installation Near Me | America\'s Trusted Experts',
+    description: 'Connect with top-rated gutter pros in your area. Seamless gutters, guards, and repairs with lifetime warranty.',
+    url: 'https://usgutterinstallation.com',
+  }
+}
 
 
 export default async function Home() {
@@ -139,6 +153,41 @@ export default async function Home() {
         </section>
 
         {/* FAQ Section */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "How much does gutter installation cost?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Costs vary by material (aluminum, copper, vinyl) and linear footage. On average, homeowners spend between $600 and $1,500. Select your city to get a precise local estimate."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Do you offer gutter guards?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! Most of our local partners offer advanced micro-mesh gutter guards to prevent clogging and reduce maintenance."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How quickly can you install?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Many of our partners offer same-week installation services. Emergency repairs can often be handled within 24-48 hours."
+                  }
+                }
+              ]
+            })
+          }}
+        />
         <section className="max-w-3xl mx-auto mb-24">
           <h2 className="text-3xl font-bold text-slate-900 mb-10 text-center">Frequently Asked Questions</h2>
           <div className="space-y-4">

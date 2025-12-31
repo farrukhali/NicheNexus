@@ -32,9 +32,9 @@ export default function RelatedServices({ city, state }: RelatedServicesProps) {
                                     </div>
                                     <h3 className="font-bold text-slate-800 text-lg leading-tight hover:text-blue-600 transition-colors">
                                         {isCityContext ? (
-                                            <Link href={linkHref}>{service.title}</Link>
+                                            <Link href={linkHref}>{service.title} Near Me</Link>
                                         ) : (
-                                            <a href={linkHref}>{service.title}</a>
+                                            <a href={linkHref}>{service.title} Near Me</a>
                                         )}
                                     </h3>
                                 </div>

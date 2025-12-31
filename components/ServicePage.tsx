@@ -62,8 +62,8 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         <div className="inline-block px-4 py-1.5 mb-6 rounded-full border border-blue-400/30 bg-blue-500/10 backdrop-blur-sm text-blue-300 text-sm font-semibold uppercase tracking-wider">
                             #1 Rated in {stateCode.toUpperCase()}
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight">
-                            Gutter Installation, Cleaning & Repair in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}, {stateCode.toUpperCase()}</span>
+                        <h1 className="text-5xl md:text-[4rem] font-extrabold text-white mb-8 leading-tight tracking-tight">
+                            Gutter Installation, Cleaning & Repair in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}, {stateCode.toUpperCase()} Near Me</span>
                         </h1>
                         <div className="text-xl md:text-2xl text-slate-300 mb-10 font-light space-y-4">
                             <p dangerouslySetInnerHTML={{ __html: content.intro.replace(/\*\*(.*?)\*\*/g, '<span class="text-white font-medium">$1</span>') }} />
@@ -335,6 +335,49 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
             </section>
 
             {/* FAQ Section */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        "mainEntity": [
+                            {
+                                "@type": "Question",
+                                "name": "How much does gutter installation cost?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": content.faqAnswers.cost
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "Do you offer warranties?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "Yes! We offer a lifetime warranty on materials and a comprehensive labor warranty on all installations."
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "Can you install gutters on any roof type?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "Absolutely. We have experience with asphalt shingles, metal roofs, slate, tile, and flat roofs."
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "How quickly can you get the job done?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": content.faqAnswers.timeline
+                                }
+                            }
+                        ]
+                    })
+                }}
+            />
             <section className="py-24 px-6 bg-slate-50">
                 <div className="max-w-4xl mx-auto">
                     <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Frequently Asked Questions in {formattedCity}</h2>
