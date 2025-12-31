@@ -107,7 +107,7 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
                         "@type": "HomeAndConstructionBusiness",
-                        "name": `GutterPro ${formattedCity}`,
+                        "name": `US Gutter Installation ${formattedCity}`,
                         "image": "https://usgutterinstallation.com/og-image.jpg",
                         "url": `https://usgutterinstallation.com/${stateCode}/${city}`,
                         "telephone": "+18588985338",

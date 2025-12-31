@@ -3,7 +3,7 @@ import Footer from '@/components/Footer'
 import { NavbarCallBtn, CallBtn } from '@/components/CallBtn'
 
 export const metadata = {
-    title: 'Contact GutterPro | Get a Free Quote Today',
+    title: 'Contact US Gutter Installation | Get a Free Quote Today',
     description: 'Contact our team for questions about gutter installation, warranties, or to schedule a free estimate in your city.',
 }
 
@@ -13,7 +13,7 @@ export default function ContactPage() {
             <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        GutterPro
+                        US Gutter Installation
                     </Link>
                     <NavbarCallBtn />
                 </div>

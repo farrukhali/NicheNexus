@@ -3,8 +3,8 @@ import Footer from '@/components/Footer'
 import { NavbarCallBtn } from '@/components/CallBtn'
 
 export const metadata = {
-    title: 'About GutterPro | America\'s Trusted Gutter Experts',
-    description: 'Learn about GutterPro, our mission to protect homes across the USA, and our network of certified gutter installation professionals.',
+    title: 'About US Gutter Installation | America\'s Trusted Gutter Experts',
+    description: 'Learn about US Gutter Installation, our mission to protect homes across the USA, and our network of certified gutter installation professionals.',
 }
 
 export default function AboutPage() {
@@ -13,7 +13,7 @@ export default function AboutPage() {
             <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        GutterPro
+                        US Gutter Installation
                     </Link>
                     <div className="flex items-center gap-6">
                         <Link href="/" className="hidden md:block text-sm font-medium text-slate-600 hover:text-blue-600">
@@ -26,11 +26,11 @@ export default function AboutPage() {
 
             <main className="pt-32 pb-24 px-6">
                 <div className="max-w-3xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-8">About GutterPro</h1>
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-8">About US Gutter Installation</h1>
 
                     <div className="space-y-6 text-lg text-slate-600 leading-relaxed">
                         <p>
-                            At GutterPro, we believe that every home deserves proper protection from water damage. What started as a small local operation has grown into a nationwide network of top-rated gutter installation and repair professionals.
+                            At US Gutter Installation, we believe that every home deserves proper protection from water damage. What started as a small local operation has grown into a nationwide network of top-rated gutter installation and repair professionals.
                         </p>
 
                         <h2 className="text-2xl font-bold text-slate-900 pt-4">Our Mission</h2>
@@ -47,7 +47,7 @@ export default function AboutPage() {
                         </ul>
 
                         <p className="pt-4">
-                            Whether you need a full replacement, a simple repair, or advanced gutter guards, GutterPro has the expertise to get the job done right, the first time.
+                            Whether you need a full replacement, a simple repair, or advanced gutter guards, US Gutter Installation has the expertise to get the job done right, the first time.
                         </p>
                     </div>
                 </div>

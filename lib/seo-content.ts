@@ -10,9 +10,9 @@ export interface ContentVars {
 
 const VARIANTS = {
     intros: [
-        (city: string, state: string) => `Homeowners in **${city}** know that protecting their property starts with a reliable roofing and gutter system. At GutterPro, we specialize in seamless gutter installation designed specifically for the weather patterns of **${state}**.`,
+        (city: string, state: string) => `Homeowners in **${city}** know that protecting their property starts with a reliable roofing and gutter system. At US Gutter Installation, we specialize in seamless gutter installation designed specifically for the weather patterns of **${state}**.`,
         (city: string, state: string) => `Living in **${city}**, effective water management is crucial for preserving your home's foundation. Our local team provides top-tier gutter replacement and installation services across **${state}**, ensuring your home stays dry year-round.`,
-        (city: string, state: string) => `Upgrade your home's curb appeal and functionality with GutterPro's premium seamless gutters. Serving the **${city}, ${state}** area, we deliver custom-fit solutions that handle heavy rainfall and prevent basement flooding.`,
+        (city: string, state: string) => `Upgrade your home's curb appeal and functionality with US Gutter Installation's premium seamless gutters. Serving the **${city}, ${state}** area, we deliver custom-fit solutions that handle heavy rainfall and prevent basement flooding.`,
     ],
     serviceDescs: [
         (city: string) => `Our **${city}** teams are equipped with on-site fabrication machines to create continuous K-style or Half-round gutters that perfectly match your home's trim.`,

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Footer from '@/components/Footer'
 
 export const metadata = {
-    title: 'Privacy Policy | GutterPro',
+    title: 'Privacy Policy | US Gutter Installation',
     description: 'Our commitment to protecting your data. Read our Privacy Policy.',
 }
 
@@ -12,7 +12,7 @@ export default function PrivacyPage() {
             <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        GutterPro
+                        US Gutter Installation
                     </Link>
                 </div>
             </nav>
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
                     <h1>Privacy Policy</h1>
                     <p>Last Updated: December 2025</p>
 
-                    <p>At GutterPro, we recognize that privacy is significant. This Privacy Policy applies to the collection, use, and disclosure of personal information by GutterPro and its affiliates.</p>
+                    <p>At US Gutter Installation, we recognize that privacy is significant. This Privacy Policy applies to the collection, use, and disclosure of personal information by US Gutter Installation and its affiliates.</p>
 
                     <h2>1. Information We Collect</h2>
                     <p>We collect information you provide directly to us, such as when you request a quote, fill out a form, or communicate with us. This may include your name, email address, phone number, and property address.</p>
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
                     <p>We take reasonable measures to help protect information about you from loss, theft, misuse and unauthorized access.</p>
 
                     <h2>5. Contact Us</h2>
-                    <p>If you have any questions about this Privacy Policy, please contact us at support@gutterpro.com.</p>
+                    <p>If you have any questions about this Privacy Policy, please contact us at support@usgutterinstallation.com.</p>
                 </div>
             </main>
 

@@ -149,7 +149,7 @@ export default async function StatePage(props: StatePageProps) {
 
                 {/* Benefits Section */}
                 <section className="mt-20 text-center max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-12">Why Choose GutterPro in {stateName}?</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-12">Why Choose US Gutter Installation in {stateName}?</h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
                             <div className="text-4xl mb-4">🛡️</div>
