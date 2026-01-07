@@ -212,7 +212,7 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         <div className="relative bg-white p-2 rounded-3xl shadow-2xl">
                             <div className="aspect-[4/3] bg-slate-200 rounded-2xl flex items-center justify-center overflow-hidden relative">
                                 <Image
-                                    src="/gutter-install-crew.jpg"
+                                    src="/gutter-crew-local.jpeg"
                                     alt={`Gutter installation in ${formattedCity}`}
                                     fill
                                     className="object-cover"
