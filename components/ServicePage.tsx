@@ -439,170 +439,175 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                                 Emergency Repairs
                             </Link>
                             {/* Structured Data: FAQ + LocalBusiness + Breadcrumb */}
-                            <script
-                                type="application/ld+json"
-                                dangerouslySetInnerHTML={{
-                                    __html: JSON.stringify([
-                                        {
-                                            "@context": "https://schema.org",
-                                            "@type": "FAQPage",
-                                            "mainEntity": content.faqAnswers ? [
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `How much does gutter installation cost in ${formattedCity}?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.cost }
-                                                },
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `What are the best gutter guards for ${stateCode} weather?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.bestGuard }
-                                                },
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `How long does gutter installation take in ${formattedCity}?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.timeline }
-                                                },
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `How often should I clean my gutters in ${formattedCity}?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.cleaningFrequency }
-                                                },
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `Do you offer emergency gutter repair in ${formattedCity}?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.emergency }
-                                                },
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `Do you repair soffit and fascia boards?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.soffitFascia }
-                                                },
-                                                {
-                                                    "@type": "Question",
-                                                    "name": `Do you offer warranties on gutter installation?`,
-                                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.warranty }
-                                                }
-                                            ] : []
-                                        },
-                                        {
-                                            "@context": "https://schema.org",
-                                            "@type": "HomeAndConstructionBusiness",
-                                            "name": `US Gutter Installation ${formattedCity}`,
-                                            "image": "https://usgutterinstallation.com/og-image.jpg",
-                                            "url": `https://usgutterinstallation.com/${stateCode.toLowerCase()}/${city.toLowerCase().replace(/ /g, '-')}`,
-                                            "telephone": "+18588985338",
-                                            "address": {
-                                                "@type": "PostalAddress",
-                                                "addressLocality": formattedCity,
-                                                "addressRegion": stateCode,
-                                                "addressCountry": "US"
-                                            },
-                                            "areaServed": {
-                                                "@type": "City",
-                                                "name": formattedCity
-                                            },
-                                            "priceRange": "$$"
-                                        },
-                                        {
-                                            "@context": "https://schema.org",
-                                            "@type": "BreadcrumbList",
-                                            "itemListElement": [
-                                                {
-                                                    "@type": "ListItem",
-                                                    "position": 1,
-                                                    "name": "Home",
-                                                    "item": "https://usgutterinstallation.com"
-                                                },
-                                                {
-                                                    "@type": "ListItem",
-                                                    "position": 2,
-                                                    "name": state,
-                                                    "item": `https://usgutterinstallation.com/${stateCode.toLowerCase()}`
-                                                },
-                                                {
-                                                    "@type": "ListItem",
-                                                    "position": 3,
-                                                    "name": formattedCity,
-                                                    "item": `https://usgutterinstallation.com/${stateCode.toLowerCase()}/${city.toLowerCase().replace(/ /g, '-')}`
-                                                }
-                                            ]
-                                        }
-                                    ])
-                                }}
-                            />
-                            <section className="py-24 px-6 bg-slate-50">
-                                <div className="max-w-4xl mx-auto">
-                                    <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Frequently Asked Questions in {formattedCity}</h2>
-
-                                    <div className="space-y-4">
-                                        {[
-                                            { q: `How much does gutter installation cost in ${formattedCity}?`, a: content.faqAnswers.cost },
-                                            { q: `What's the best gutter guard for ${stateCode.toUpperCase()} weather?`, a: content.faqAnswers.bestGuard },
-                                            { q: `Do you offer emergency gutter repair in ${formattedCity}?`, a: content.faqAnswers.emergency },
-                                            { q: `How often should gutters be cleaned in ${stateCode.toUpperCase()}?`, a: content.faqAnswers.cleaningFrequency },
-                                            { q: `Do you repair soffit and fascia near me in ${formattedCity}?`, a: content.faqAnswers.soffitFascia },
-                                            { q: "Do you offer warranties?", a: content.faqAnswers.warranty },
-                                            { q: "Can you install gutters on any roof type?", a: "Absolutely. We have experience with asphalt shingles, metal roofs, slate, tile, and flat roofs." },
-                                            { q: "How quickly can you get the job done?", a: content.faqAnswers.timeline }
-                                        ].map((faq, i) => (
-                                            <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                                                <h3 className="text-lg font-bold text-slate-900 mb-2">{faq.q}</h3>
-                                                <p className="text-slate-600">{faq.a}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Testimonials Section (Social Proof) */}
-                            <section className="py-24 px-6 bg-slate-50 border-t border-slate-200">
-                                <div className="max-w-7xl mx-auto">
-                                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 text-center">
-                                        What Neighbors in {formattedCity} Are Saying
-                                    </h2>
-                                    <div className="grid md:grid-cols-3 gap-8">
-                                        {[
-                                            { name: "Michael R.", role: "Homeowner", text: "They came out the next day for a quote and installed everything on Saturday. Super clean work.", stars: 5 },
-                                            { name: "Sarah J.", role: "Local Resident", text: "I was worried about the cost, but their quote was significantly lower than the other two I got. Highly recommend.", stars: 5 },
-                                            { name: "David K.", role: "Business Owner", text: "Professional from start to finish. The seamless gutters look amazing on my Victorian home.", stars: 5 }
-                                        ].map((review, i) => (
-                                            <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                                                <div className="flex text-yellow-400 mb-4">
-                                                    {[...Array(review.stars)].map((_, i) => <span key={i}>★</span>)}
-                                                </div>
-                                                <p className="text-slate-600 mb-6 italic">"{review.text}"</p>
-                                                <div>
-                                                    <div className="font-bold text-slate-900">{review.name}</div>
-                                                    <div className="text-sm text-slate-500">{review.role}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* CTA Section */}
-                            <section className="py-24 px-6 bg-slate-900 relative overflow-hidden">
-                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-                                <div className="max-w-4xl mx-auto text-center relative z-10">
-                                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-                                        Ready to upgrade your home in {formattedCity}?
-                                    </h2>
-                                    <p className="text-blue-200 text-xl mb-10 max-w-2xl mx-auto">
-                                        Get a comprehensive quote in minutes. No obligation, just honest expert advice.
-                                    </p>
-                                    <CallBtn className="py-4 px-12 text-xl" label={`Call Now in ${formattedCity}`} />
-                                </div>
-                            </section>
-
-                            {/* Internal Links for Crawlability */}
-                            <InternalLinks
-                                currentCity={formattedCity}
-                                stateCode={stateCode}
-                                relatedCities={relatedCities}
-                            />
-
-                            <TrustBadges />
-                            <Footer />
                         </div>
+                    </div>
+                </div>
+            </section>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify([
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "FAQPage",
+                            "mainEntity": content.faqAnswers ? [
+                                {
+                                    "@type": "Question",
+                                    "name": `How much does gutter installation cost in ${formattedCity}?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.cost }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": `What are the best gutter guards for ${stateCode} weather?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.bestGuard }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": `How long does gutter installation take in ${formattedCity}?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.timeline }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": `How often should I clean my gutters in ${formattedCity}?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.cleaningFrequency }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": `Do you offer emergency gutter repair in ${formattedCity}?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.emergency }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": `Do you repair soffit and fascia boards?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.soffitFascia }
+                                },
+                                {
+                                    "@type": "Question",
+                                    "name": `Do you offer warranties on gutter installation?`,
+                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.warranty }
+                                }
+                            ] : []
+                        },
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "HomeAndConstructionBusiness",
+                            "name": `US Gutter Installation ${formattedCity}`,
+                            "image": "https://usgutterinstallation.com/og-image.jpg",
+                            "url": `https://usgutterinstallation.com/${stateCode.toLowerCase()}/${city.toLowerCase().replace(/ /g, '-')}`,
+                            "telephone": "+18588985338",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "addressLocality": formattedCity,
+                                "addressRegion": stateCode,
+                                "addressCountry": "US"
+                            },
+                            "areaServed": {
+                                "@type": "City",
+                                "name": formattedCity
+                            },
+                            "priceRange": "$$"
+                        },
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "BreadcrumbList",
+                            "itemListElement": [
+                                {
+                                    "@type": "ListItem",
+                                    "position": 1,
+                                    "name": "Home",
+                                    "item": "https://usgutterinstallation.com"
+                                },
+                                {
+                                    "@type": "ListItem",
+                                    "position": 2,
+                                    "name": state,
+                                    "item": `https://usgutterinstallation.com/${stateCode.toLowerCase()}`
+                                },
+                                {
+                                    "@type": "ListItem",
+                                    "position": 3,
+                                    "name": formattedCity,
+                                    "item": `https://usgutterinstallation.com/${stateCode.toLowerCase()}/${city.toLowerCase().replace(/ /g, '-')}`
+                                }
+                            ]
+                        }
+                    ])
+                }}
+            />
+            <section className="py-24 px-6 bg-slate-50">
+                <div className="max-w-4xl mx-auto">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Frequently Asked Questions in {formattedCity}</h2>
+
+                    <div className="space-y-4">
+                        {[
+                            { q: `How much does gutter installation cost in ${formattedCity}?`, a: content.faqAnswers.cost },
+                            { q: `What's the best gutter guard for ${stateCode.toUpperCase()} weather?`, a: content.faqAnswers.bestGuard },
+                            { q: `Do you offer emergency gutter repair in ${formattedCity}?`, a: content.faqAnswers.emergency },
+                            { q: `How often should gutters be cleaned in ${stateCode.toUpperCase()}?`, a: content.faqAnswers.cleaningFrequency },
+                            { q: `Do you repair soffit and fascia near me in ${formattedCity}?`, a: content.faqAnswers.soffitFascia },
+                            { q: "Do you offer warranties?", a: content.faqAnswers.warranty },
+                            { q: "Can you install gutters on any roof type?", a: "Absolutely. We have experience with asphalt shingles, metal roofs, slate, tile, and flat roofs." },
+                            { q: "How quickly can you get the job done?", a: content.faqAnswers.timeline }
+                        ].map((faq, i) => (
+                            <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">{faq.q}</h3>
+                                <p className="text-slate-600">{faq.a}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Testimonials Section (Social Proof) */}
+            <section className="py-24 px-6 bg-slate-50 border-t border-slate-200">
+                <div className="max-w-7xl mx-auto">
+                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 text-center">
+                        What Neighbors in {formattedCity} Are Saying
+                    </h2>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            { name: "Michael R.", role: "Homeowner", text: "They came out the next day for a quote and installed everything on Saturday. Super clean work.", stars: 5 },
+                            { name: "Sarah J.", role: "Local Resident", text: "I was worried about the cost, but their quote was significantly lower than the other two I got. Highly recommend.", stars: 5 },
+                            { name: "David K.", role: "Business Owner", text: "Professional from start to finish. The seamless gutters look amazing on my Victorian home.", stars: 5 }
+                        ].map((review, i) => (
+                            <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex text-yellow-400 mb-4">
+                                    {[...Array(review.stars)].map((_, i) => <span key={i}>★</span>)}
+                                </div>
+                                <p className="text-slate-600 mb-6 italic">"{review.text}"</p>
+                                <div>
+                                    <div className="font-bold text-slate-900">{review.name}</div>
+                                    <div className="text-sm text-slate-500">{review.role}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="py-24 px-6 bg-slate-900 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+                <div className="max-w-4xl mx-auto text-center relative z-10">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
+                        Ready to upgrade your home in {formattedCity}?
+                    </h2>
+                    <p className="text-blue-200 text-xl mb-10 max-w-2xl mx-auto">
+                        Get a comprehensive quote in minutes. No obligation, just honest expert advice.
+                    </p>
+                    <CallBtn className="py-4 px-12 text-xl" label={`Call Now in ${formattedCity}`} />
+                </div>
+            </section>
+
+            {/* Internal Links for Crawlability */}
+            <InternalLinks
+                currentCity={formattedCity}
+                stateCode={stateCode}
+                relatedCities={relatedCities}
+            />
+
+            <TrustBadges />
+            <Footer />
+        </div>
+    )
 }
