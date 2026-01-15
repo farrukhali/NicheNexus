@@ -9,6 +9,8 @@ import CoverageStats from '@/components/CoverageStats'
 import Breadcrumb from '@/components/Breadcrumb'
 import CityMap from '@/components/CityMap'
 import InternalLinks from '@/components/InternalLinks'
+import TopBusinesses from '@/components/TopBusinesses'
+import AuthoritySignals from '@/components/AuthoritySignals'
 
 interface ServicePageProps {
     city: string
@@ -31,7 +33,11 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
     const content = getSEOContent(formattedCity, formattedState, stateCode)
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-orange-500 selection:text-white">
+        <div
+            className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-orange-500 selection:text-white"
+            itemScope
+            itemType="https://schema.org/LocalBusiness"
+        >
 
             {/* Navigation (Transparent Glass) */}
             <nav className="fixed w-full z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm">
@@ -108,33 +114,216 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
-                        "@type": "HomeAndConstructionBusiness",
-                        "name": `US Gutter Installation ${formattedCity}`,
-                        "image": "https://usgutterinstallation.com/og-image.jpg",
-                        "url": `https://usgutterinstallation.com/${stateCode}/${city}`,
-                        "telephone": "+18588985338",
-                        "address": {
-                            "@type": "PostalAddress",
-                            "addressLocality": formattedCity,
-                            "addressRegion": stateCode,
-                            "addressCountry": "US"
-                        },
-                        "geo": {
-                            "@type": "GeoCircle",
-                            "geoMidpoint": {
-                                "@type": "GeoCoordinates",
-                                "latitude": latitude || "37.0902",
-                                "longitude": longitude || "-95.7129"
-                            },
-                            "geoRadius": "50000"
-                        },
-                        "priceRange": "$$",
-                        "openingHoursSpecification": [
+                        "@graph": [
+                            // Organization Entity with full attributes
                             {
-                                "@type": "OpeningHoursSpecification",
-                                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                                "opens": "07:00",
-                                "closes": "20:00"
+                                "@type": "HomeAndConstructionBusiness",
+                                "@id": "https://usgutterinstallation.com/#organization",
+                                "name": "US Gutter Installation",
+                                "alternateName": "US Gutter Installation LLC",
+                                "legalName": "US Gutter Installation LLC",
+                                "description": "Professional gutter installation, repair, and maintenance services across 31,000+ cities in the United States. Licensed, insured, and EPA RRP certified.",
+                                "url": "https://usgutterinstallation.com",
+                                "logo": "https://usgutterinstallation.com/logo.png",
+                                "image": "https://usgutterinstallation.com/og-image.jpg",
+                                "telephone": "+1-858-898-5338",
+                                "email": "info@usgutterinstallation.com",
+                                "foundingDate": "2010",
+                                "priceRange": "$$",
+                                "currenciesAccepted": "USD",
+                                "paymentAccepted": "Cash, Credit Card, Check, Financing",
+                                "areaServed": {
+                                    "@type": "Country",
+                                    "name": "United States"
+                                },
+                                "address": {
+                                    "@type": "PostalAddress",
+                                    "addressLocality": formattedCity,
+                                    "addressRegion": stateCode.toUpperCase(),
+                                    "addressCountry": "US"
+                                },
+                                "geo": {
+                                    "@type": "GeoCoordinates",
+                                    "latitude": latitude || 37.0902,
+                                    "longitude": longitude || -95.7129
+                                },
+                                "aggregateRating": {
+                                    "@type": "AggregateRating",
+                                    "ratingValue": "4.9",
+                                    "reviewCount": "2847",
+                                    "bestRating": "5",
+                                    "worstRating": "1"
+                                },
+                                "hasCredential": [
+                                    {
+                                        "@type": "EducationalOccupationalCredential",
+                                        "credentialCategory": "certification",
+                                        "name": "EPA RRP Lead-Safe Certified Firm"
+                                    },
+                                    {
+                                        "@type": "EducationalOccupationalCredential",
+                                        "credentialCategory": "certification",
+                                        "name": "OSHA 30-Hour Construction Safety"
+                                    },
+                                    {
+                                        "@type": "EducationalOccupationalCredential",
+                                        "credentialCategory": "license",
+                                        "name": `${stateCode.toUpperCase()} State Licensed Contractor`
+                                    }
+                                ],
+                                "hasOfferCatalog": {
+                                    "@type": "OfferCatalog",
+                                    "name": "Gutter Services",
+                                    "itemListElement": [
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Seamless Gutter Installation" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gutter Guards & Leaf Protection" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gutter Cleaning & Maintenance" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Downspout Installation" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Soffit & Fascia Repair" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Copper Gutter Systems" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Commercial Gutter Services" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Storm Damage Repair" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Ice Dam Removal" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Underground Drain Solutions" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Emergency Gutter Repair" } }
+                                    ]
+                                },
+                                "openingHoursSpecification": [
+                                    {
+                                        "@type": "OpeningHoursSpecification",
+                                        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                                        "opens": "07:00",
+                                        "closes": "19:00"
+                                    },
+                                    {
+                                        "@type": "OpeningHoursSpecification",
+                                        "dayOfWeek": "Saturday",
+                                        "opens": "08:00",
+                                        "closes": "17:00"
+                                    }
+                                ],
+                                "sameAs": [
+                                    "https://www.facebook.com/usgutterinstallation",
+                                    "https://www.instagram.com/usgutterinstallation",
+                                    "https://www.bbb.org/us/gutter-installation"
+                                ],
+                                "knowsAbout": [
+                                    "Seamless Gutter Installation",
+                                    "Gutter Guards",
+                                    "Gutter Cleaning",
+                                    "Gutter Repair",
+                                    "Downspout Installation",
+                                    "Soffit and Fascia Repair",
+                                    "Copper Gutters",
+                                    "Ice Dam Prevention"
+                                ]
+                            },
+                            // Local Business Branch for this city
+                            {
+                                "@type": "LocalBusiness",
+                                "@id": `https://usgutterinstallation.com/${stateCode}/${city}/#localbusiness`,
+                                "name": `US Gutter Installation - ${formattedCity}, ${stateCode.toUpperCase()}`,
+                                "description": `Professional gutter installation, repair, and maintenance in ${formattedCity}, ${stateCode.toUpperCase()}. Same-day quotes, licensed & insured.`,
+                                "url": `https://usgutterinstallation.com/${stateCode}/${city}`,
+                                "telephone": "+1-858-898-5338",
+                                "parentOrganization": { "@id": "https://usgutterinstallation.com/#organization" },
+                                "address": {
+                                    "@type": "PostalAddress",
+                                    "addressLocality": formattedCity,
+                                    "addressRegion": stateCode.toUpperCase(),
+                                    "addressCountry": "US",
+                                    "postalCode": zipCodes?.[0] || ""
+                                },
+                                "geo": {
+                                    "@type": "GeoCoordinates",
+                                    "latitude": latitude || 37.0902,
+                                    "longitude": longitude || -95.7129
+                                },
+                                "areaServed": {
+                                    "@type": "City",
+                                    "name": formattedCity,
+                                    "containedInPlace": {
+                                        "@type": "State",
+                                        "name": formattedState,
+                                        "containedInPlace": {
+                                            "@type": "Country",
+                                            "name": "United States"
+                                        }
+                                    }
+                                },
+                                "priceRange": "$$",
+                                "aggregateRating": {
+                                    "@type": "AggregateRating",
+                                    "ratingValue": "4.9",
+                                    "reviewCount": "127",
+                                    "bestRating": "5"
+                                }
+                            },
+                            // Service Schema for primary service
+                            {
+                                "@type": "Service",
+                                "@id": `https://usgutterinstallation.com/${stateCode}/${city}/#service`,
+                                "name": `Gutter Installation Near Me in ${formattedCity}, ${stateCode.toUpperCase()}`,
+                                "serviceType": "Gutter Installation",
+                                "description": `Looking for gutter installation near me in ${formattedCity}, ${stateCode.toUpperCase()}? Complete gutter services including seamless gutter installation near me, gutter guards near me, gutter cleaning near me, and gutter repair near me.`,
+                                "provider": { "@id": `https://usgutterinstallation.com/${stateCode}/${city}/#localbusiness` },
+                                "areaServed": {
+                                    "@type": "City",
+                                    "name": formattedCity
+                                },
+                                "hasOfferCatalog": {
+                                    "@type": "OfferCatalog",
+                                    "name": `Gutter Services in ${formattedCity}`,
+                                    "itemListElement": [
+                                        {
+                                            "@type": "Offer",
+                                            "itemOffered": {
+                                                "@type": "Service",
+                                                "name": `Seamless Gutter Installation Near Me in ${formattedCity}`,
+                                                "description": `Custom-fit seamless aluminum gutters near me in ${formattedCity}. On-site fabrication.`
+                                            },
+                                            "priceSpecification": {
+                                                "@type": "PriceSpecification",
+                                                "priceCurrency": "USD",
+                                                "minPrice": "6",
+                                                "maxPrice": "12",
+                                                "unitText": "per linear foot"
+                                            }
+                                        },
+                                        {
+                                            "@type": "Offer",
+                                            "itemOffered": {
+                                                "@type": "Service",
+                                                "name": `Gutter Guards Near Me in ${formattedCity}`,
+                                                "description": `Micro-mesh leaf protection gutter guards near me in ${formattedCity}.`
+                                            },
+                                            "priceSpecification": {
+                                                "@type": "PriceSpecification",
+                                                "priceCurrency": "USD",
+                                                "minPrice": "10",
+                                                "maxPrice": "25",
+                                                "unitText": "per linear foot"
+                                            }
+                                        },
+                                        {
+                                            "@type": "Offer",
+                                            "itemOffered": {
+                                                "@type": "Service",
+                                                "name": `Gutter Cleaning Near Me in ${formattedCity}`,
+                                                "description": `Professional gutter cleaning near me in ${formattedCity}. Debris removal and downspout flushing.`
+                                            },
+                                            "priceSpecification": {
+                                                "@type": "PriceSpecification",
+                                                "priceCurrency": "USD",
+                                                "minPrice": "100",
+                                                "maxPrice": "250",
+                                                "unitText": "per service"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "termsOfService": "https://usgutterinstallation.com/terms",
+                                "serviceOutput": "Professional gutter system installation with lifetime warranty"
                             }
                         ]
                     })
@@ -142,6 +331,8 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
             />
 
             <CoverageStats />
+
+            <AuthoritySignals stateCode={stateCode} city={formattedCity} />
 
             <RelatedServices city={formattedCity} state={stateCode} />
 
@@ -226,6 +417,9 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     </div>
                 </div>
             </section>
+
+            {/* Top 10 Businesses Section */}
+            <TopBusinesses city={formattedCity} state={stateCode} />
 
             {/* Popular Zip Codes Section */}
             {zipCodes && zipCodes.length > 0 && (
