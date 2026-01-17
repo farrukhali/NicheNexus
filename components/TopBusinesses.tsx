@@ -15,32 +15,20 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
+    // Format city for display
+    const formattedCity = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+    const stateUpper = state.toUpperCase()
+
     // Fetch leads for the specific city and state
-    // Matching logic: filter by city and state columns.
-    // The user said: "leads" table has "company name", "address", "city name", "state name", "service name".
-    // I need to guess column names or try standard ones.
-    // Common: city, state, company_name, address.
-    // User said "city name" and "state name". I will try "city" and "state" first, or "city_name", "state_name".
-    // Let's assume common snake_case: "city", "state", "company_name", "address".
-    // Or maybe "City", "State".
-    // I'll try generic match. If it fails, I might need to ask or debug.
-    // But since I can't interactively debug easily without running code, I'll try to select all and inspect in a real scenario, but here I must code it.
-    // Unsafe approach: Guessing column names.
-    // Safer approach: Select * and filter in code? No, efficient to filter in DB.
-    // I will try insensitive match if possible.
-    // Let's try columns: 'company_name', 'address', 'city', 'state'.
-
-    // Note: The user said "har city ka 10 company k data ha".
-
+    // DB has city="New York", state="NY" - need to match with proper formatting
     const { data: leads, error } = await supabase
         .from('leads')
         .select('*')
-        .ilike('city', city)
-        .ilike('state', state)
+        .ilike('city', formattedCity)
+        .ilike('state', stateUpper)
         .limit(10)
 
     if (error || !leads || leads.length === 0) {
-        // Fallback or empty return
         console.error('Error fetching leads:', error)
         return null
     }
@@ -58,45 +46,96 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
         "Get Pricing"
     ]
 
-    const mainPhoneNumber = "+18588985338" // From ServicePage/Schema
+    const mainPhoneNumber = "+18588985338"
+
+    // Generate ItemList schema for SEO
+    const itemListSchema = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": `Top ${leads.length} Best Gutter Services Near Me in ${formattedCity}, ${stateUpper}`,
+        "description": `Find the best gutter installation, cleaning, and repair companies near me in ${formattedCity}, ${stateUpper}. Verified local contractors.`,
+        "numberOfItems": leads.length,
+        "itemListElement": leads.map((lead: any, index: number) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+                "@type": "LocalBusiness",
+                "name": lead.company_name || lead.name || "Local Gutter Pro",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": lead.address || "",
+                    "addressLocality": formattedCity,
+                    "addressRegion": stateUpper
+                },
+                "telephone": mainPhoneNumber,
+                "priceRange": "$$",
+                "areaServed": formattedCity
+            }
+        }))
+    }
 
     return (
-        <section className="py-16 px-6 bg-white border-t border-slate-100">
+        <section
+            className="py-16 px-6 bg-gradient-to-b from-white to-slate-50 border-t border-slate-100"
+            itemScope
+            itemType="https://schema.org/ItemList"
+        >
+            {/* ItemList Schema for SEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+            />
+
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-10">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                        Top 10 Best Gutter Cleaning in {city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}, {state.toUpperCase()}
+                    <span className="text-blue-600 font-bold uppercase tracking-wider text-sm">Trusted Local Pros</span>
+                    <h2
+                        className="text-3xl font-bold text-slate-900 mt-2 mb-4"
+                        itemProp="name"
+                    >
+                        Top {leads.length} Best Gutter Services Near Me in {formattedCity}, {stateUpper}
                     </h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto">
-                        We have curated a list of the top-rated gutter service providers in your area.
-                        Connect with trusted local experts for all your gutter cleaning and installation needs.
+                    <p className="text-slate-600 max-w-2xl mx-auto" itemProp="description">
+                        Looking for gutter installation near me in {formattedCity}? Connect with our vetted, top-rated
+                        local gutter contractors for cleaning, repair, and new installations.
                     </p>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+                <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-lg bg-white">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-slate-50 border-b border-slate-200">
+                        <thead className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
                             <tr>
-                                <th className="py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider">Company Name</th>
-                                <th className="py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider hidden sm:table-cell">Address</th>
-                                <th className="py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider text-right">Action</th>
+                                <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider">#</th>
+                                <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider">Company Name</th>
+                                <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider hidden sm:table-cell">Address</th>
+                                <th className="py-4 px-6 text-sm font-semibold uppercase tracking-wider text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {leads.map((lead: any, index: number) => {
                                 const actionText = actionTexts[index % actionTexts.length]
                                 return (
-                                    <tr key={lead.id || index} className="hover:bg-blue-50/50 transition-colors group">
-                                        <td className="py-4 px-6 font-medium text-slate-900">
+                                    <tr
+                                        key={lead.id || index}
+                                        className="hover:bg-blue-50/50 transition-colors group"
+                                        itemScope
+                                        itemType="https://schema.org/LocalBusiness"
+                                        itemProp="itemListElement"
+                                    >
+                                        <td className="py-4 px-6 font-bold text-blue-600">
+                                            {index + 1}
+                                        </td>
+                                        <td className="py-4 px-6 font-medium text-slate-900" itemProp="name">
                                             {lead.company_name || lead.name || "Local Gutter Pro"}
                                         </td>
-                                        <td className="py-4 px-6 text-slate-500 text-sm hidden sm:table-cell">
-                                            {lead.address || `${city}, ${state}`}
+                                        <td className="py-4 px-6 text-slate-500 text-sm hidden sm:table-cell" itemProp="address">
+                                            {lead.address || `${formattedCity}, ${stateUpper}`}
                                         </td>
                                         <td className="py-4 px-6 text-right">
                                             <a
                                                 href={`tel:${mainPhoneNumber}`}
-                                                className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-6 rounded-full transition-all hover:scale-105 shadow-md shadow-blue-200"
+                                                className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-bold py-2.5 px-6 rounded-full transition-all hover:scale-105 shadow-md shadow-blue-200"
+                                                itemProp="telephone"
                                             >
                                                 {actionText}
                                             </a>
@@ -107,12 +146,14 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
                         </tbody>
                     </table>
                 </div>
+
                 <div className="mt-8 text-center">
                     <p className="text-sm text-slate-500 italic">
-                        * Vetted service providers serving the {city} area.
+                        ✓ All service providers are vetted and verified for {formattedCity} area.
                     </p>
                 </div>
             </div>
         </section>
     )
 }
+
