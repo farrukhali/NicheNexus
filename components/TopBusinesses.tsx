@@ -52,8 +52,8 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
     const itemListSchema = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": `Top ${leads.length} Best Gutter Services Near Me in ${formattedCity}, ${stateUpper}`,
-        "description": `Find the best gutter installation, cleaning, and repair companies near me in ${formattedCity}, ${stateUpper}. Verified local contractors.`,
+        "name": `Top ${leads.length} Best Gutter Service Providers Near Me in ${formattedCity}, ${stateUpper}`,
+        "description": `Find the best gutter installation, cleaning, and repair service providers near me in ${formattedCity}, ${stateUpper}. Verified local contractors.`,
         "numberOfItems": leads.length,
         "itemListElement": leads.map((lead: any, index: number) => ({
             "@type": "ListItem",
@@ -93,7 +93,7 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
                         className="text-3xl font-bold text-slate-900 mt-2 mb-4"
                         itemProp="name"
                     >
-                        Top {leads.length} Best Gutter Services Near Me in {formattedCity}, {stateUpper}
+                        Top {leads.length} Best Gutter Service Providers Near Me in {formattedCity}, {stateUpper}
                     </h2>
                     <p className="text-slate-600 max-w-2xl mx-auto" itemProp="description">
                         Looking for gutter installation near me in {formattedCity}? Connect with our vetted, top-rated
