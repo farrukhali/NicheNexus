@@ -78,5 +78,6 @@ export default async function Page(props: PageProps) {
         relatedCities={relatedCities}
         latitude={cityData?.lat}
         longitude={cityData?.lng}
+        customIntro={cityData?.seo_intro}
     />
 }

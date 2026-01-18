@@ -357,13 +357,15 @@ export default function ServiceSpecificPage({ city, state, stateCode, service, r
                         <div className="relative w-full aspect-square max-w-lg mx-auto">
                             <div className="absolute inset-0 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
                             {/* Placeholder for Sump Pump - we removed the gutter image reference */}
-                            <div className="relative z-10 w-full h-full bg-slate-800 rounded-2xl flex items-center justify-center border border-slate-700 shadow-2xl overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-cyan-400/20"></div>
-                                <div className="text-center p-8">
-                                    <div className="text-6xl mb-4">{service.icon}</div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">Pipey Pro</h3>
-                                    <p className="text-blue-200">Expert {service.title}</p>
-                                </div>
+                            <div className="relative z-10 w-full h-full rounded-2xl overflow-hidden">
+                                <Image
+                                    src="https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png"
+                                    alt="Professional Sump Pump Installation & Repair"
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
                             </div>
                         </div>
                     </div>
