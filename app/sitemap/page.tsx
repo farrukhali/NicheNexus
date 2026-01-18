@@ -1,124 +1,85 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import Footer from '@/components/Footer'
+import { Metadata } from 'next'
 
-export const revalidate = 86400 // Cache for 1 day
+export const revalidate = 86400 // Daily revalidation
 
-interface LocationData {
-    state_id: string
-    city: string
+export const metadata: Metadata = {
+    title: 'Site Directory | Pipey Pro',
+    description: 'Browse our complete directory of Sump Pump Installation and Repair services by state and city.',
+    robots: {
+        index: true,
+        follow: true
+    }
 }
 
-const STATE_NAMES: Record<string, string> = {
-    AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
-    CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
-    HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
-    KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
-    MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri",
-    MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey",
-    NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio",
-    OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
-    SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
-    VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
-    DC: "District of Columbia"
-}
+export default async function SitemapPage() {
+    // efficient fetch of distinct states
+    const { data: cities } = await supabase
+        .from('usa city name')
+        .select('state_id, state_name')
 
-export default async function HtmlSitemap() {
-    // Fetch all cities and states using a loop to bypass 1000-row limit
-    let allLocations: LocationData[] = []
-    let from = 0
-    const step = 999
-
-    while (true) {
-        const { data: chunk, error } = await supabase
-            .from('usa city name')
-            .select('state_id, city')
-            .order('state_id', { ascending: true })
-            .order('city', { ascending: true })
-            .range(from, from + step)
-
-        if (error || !chunk || chunk.length === 0) {
-            console.error('Sitemap fetch error or complete:', error)
-            break
-        }
-
-        allLocations = [...allLocations, ...chunk]
-
-        if (chunk.length < step) {
-            break // We reached the end
-        }
-
-        from += step + 1
-    }
-
-    const locations = allLocations
-
-    if (!locations) {
-        return <div className="p-12 text-center">Failed to load sitemap.</div>
-    }
-
-    // Group by State
-    const sitemapData = locations.reduce((acc, loc: LocationData) => {
-        const stateCode = loc.state_id.toUpperCase()
-        if (!acc[stateCode]) {
-            acc[stateCode] = []
-        }
-        acc[stateCode].push(loc.city)
-        return acc
-    }, {} as Record<string, string[]>)
-
-    const sortedStates = Object.keys(sitemapData).sort()
+    // Deduplicate states
+    const uniqueStates = Array.from(new Map(cities?.map(item => [item.state_id, item])).values())
+        .sort((a, b) => a.state_name.localeCompare(b.state_name))
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <header className="mb-12 border-b border-slate-200 pb-8">
-                    <h1 className="text-4xl font-bold text-slate-900 mb-4">Site Directory</h1>
-                    <p className="text-xl text-slate-600">
-                        Browse all our {locations.length.toLocaleString()} service locations across the United States.
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+            <nav className="bg-white border-b border-slate-200 py-4 px-6">
+                <div className="max-w-7xl mx-auto flex justify-between items-center">
+                    <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
+                        Pipey Pro
+                    </Link>
+                    <Link href="/" className="text-sm font-medium text-slate-600 hover:text-blue-600">
+                        Back to Home
+                    </Link>
+                </div>
+            </nav>
+
+            <main className="max-w-7xl mx-auto py-16 px-6">
+                <header className="mb-12">
+                    <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Site Directory</h1>
+                    <p className="text-lg text-slate-600 max-w-2xl">
+                        Find local sump pump repair and installation experts in your area. Browse by state below.
                     </p>
-                    <div className="mt-4">
-                        <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
-                            &larr; Back to Home
-                        </Link>
-                    </div>
                 </header>
 
-                <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {sortedStates.map(stateCode => (
-                        <div key={stateCode} className="bg-white rounded-lg shadow-sm p-6 border border-slate-100 hover:shadow-md transition-shadow">
-                            <h2 className="text-2xl font-bold text-slate-900 mb-4 border-b pb-2 flex items-center justify-between">
-                                <span className="truncate mr-2" title={STATE_NAMES[stateCode] || stateCode}>
-                                    {STATE_NAMES[stateCode] || stateCode}
+                <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-6 pb-4 border-b border-slate-100">
+                        Service Areas by State
+                    </h2>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-y-4 gap-x-6">
+                        {uniqueStates.map((state) => (
+                            <Link
+                                key={state.state_id}
+                                href={`/${state.state_id.toLowerCase()}`}
+                                className="group flex items-center justify-between py-2 px-3 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                            >
+                                <span className="font-medium text-slate-700 group-hover:text-blue-600">
+                                    {state.state_name}
                                 </span>
-                                <Link
-                                    href={`/${stateCode.toLowerCase()}`}
-                                    className="text-sm font-normal text-blue-600 hover:underline whitespace-nowrap"
-                                >
-                                    View State
-                                </Link>
-                            </h2>
-                            <ul className="space-y-2 h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
-                                {sitemapData[stateCode].map(city => {
-                                    const citySlug = city.toLowerCase().replace(/ /g, '-')
-                                    return (
-                                        <li key={`${stateCode}-${city}`}>
-                                            <Link
-                                                href={`/${stateCode.toLowerCase()}/${citySlug}`}
-                                                className="text-slate-600 hover:text-blue-600 hover:underline block truncate text-sm"
-                                            >
-                                                {city}
-                                            </Link>
-                                        </li>
-                                    )
-                                })}
-                            </ul>
-                            <div className="mt-4 pt-2 border-t text-xs text-slate-400 text-right">
-                                {sitemapData[stateCode].length} Locations
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+                                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-full group-hover:bg-blue-50 group-hover:text-blue-500">
+                                    {state.state_id}
+                                </span>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="mt-12 bg-blue-50 rounded-2xl p-8 border border-blue-100">
+                    <h2 className="text-xl font-bold text-blue-900 mb-4">Main Pages</h2>
+                    <ul className="flex flex-wrap gap-6 text-blue-800 font-medium">
+                        <li><Link href="/" className="hover:underline">Home</Link></li>
+                        <li><Link href="/about" className="hover:underline">About Us</Link></li>
+                        <li><Link href="/contact" className="hover:underline">Contact</Link></li>
+                        <li><Link href="/privacy" className="hover:underline">Privacy Policy</Link></li>
+                    </ul>
+                </section>
+            </main>
+
+            <Footer />
         </div>
     )
 }
