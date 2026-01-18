@@ -14,7 +14,7 @@ export default function RelatedServices({ city, state }: RelatedServicesProps) {
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
                     <span className="text-blue-600 font-bold uppercase tracking-wider text-sm">Comprehensive Coverage</span>
-                    <h2 className="text-3xl font-bold text-slate-900 mt-2">More than just Gutters</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 mt-2">Complete Basement Protection</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -22,7 +22,7 @@ export default function RelatedServices({ city, state }: RelatedServicesProps) {
                         const citySlug = city?.toLowerCase().replace(/ /g, '-')
                         // If we are on a city page, link to service page. Otherwise link to phone.
                         const isCityContext = city && state
-                        const linkHref = isCityContext ? `/${state?.toLowerCase()}/${citySlug}/${service.slug}` : 'tel:+18588985338'
+                        const linkHref = isCityContext ? `/${state?.toLowerCase()}/${citySlug}/${service.slug}` : 'tel:+13213420091'
 
                         return (
                             <div key={index} className="flex flex-col h-full bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">

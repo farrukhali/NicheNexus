@@ -29,7 +29,7 @@ export async function generateMetadata(props: StartServicePageProps): Promise<Me
     const formattedState = state.toUpperCase()
 
     return {
-        title: `${serviceInfo.title} ${formattedCity}, ${formattedState} | US Gutter Installation`,
+        title: `${serviceInfo.title} ${formattedCity}, ${formattedState} | Pipey Pro`,
         description: serviceInfo.description(formattedCity, formattedState),
         alternates: {
             canonical: `/${state.toLowerCase()}/${city.toLowerCase()}/${service}`

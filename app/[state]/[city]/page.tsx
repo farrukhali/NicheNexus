@@ -35,16 +35,16 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const metaTitle = getMetaTitle(formattedCity, stateCode, stateName)
 
     return {
-        title: `Gutter Installation Near Me in ${formattedCity}, ${stateCode} | Local Contractors`,
-        description: `Looking for gutter installation near me in ${formattedCity}, ${stateCode}? Find licensed local gutter contractors for seamless gutters, gutter guards, gutter cleaning, soffit & fascia repair. Get a free quote in 24 hours!`,
-        keywords: `gutter installation near me ${formattedCity}, gutter repair near me ${formattedCity} ${stateCode}, gutter guards near me ${formattedCity}, seamless gutters near me ${formattedCity}, gutter cleaning near me ${formattedCity}, soffit repair near me ${formattedCity}, gutter companies near me ${formattedCity}`,
+        title: `Sump Pump Installation Near Me in ${formattedCity}, ${stateCode} | Local Pros`,
+        description: `Looking for sump pump installation near me in ${formattedCity}, ${stateCode}? Find licensed local plumbers for sump pump repair, replacement, battery backups & waterproofing. Free quote!`,
+        keywords: `sump pump installation near me ${formattedCity}, sump pump repair near me ${formattedCity} ${stateCode}, battery backup sump pump near me ${formattedCity}, basement waterproofing near me ${formattedCity}, sewage pump repair near me ${formattedCity}, french drain installation near me ${formattedCity}, plumbing contractors near me ${formattedCity}`,
         alternates: {
             canonical: `/${state.toLowerCase()}/${city.toLowerCase()}`
         },
         openGraph: {
-            title: `Find Gutter Installation Near Me in ${formattedCity}, ${stateCode}`,
-            description: `Connect with the #1 rated gutter contractors near you in ${formattedCity}. Seamless gutters, gutter guards, cleaning & repairs. Lifetime warranty. Free quotes!`,
-            url: `https://usgutterinstallation.com/${state}/${city}`,
+            title: `Find Sump Pump Installation Near Me in ${formattedCity}, ${stateCode}`,
+            description: `Connect with the #1 rated sump pump and waterproofing contractors near you in ${formattedCity}. Repair, replacement, and backups. 24/7 Service. Free quotes!`,
+            url: `https://pipeypro.com/${state}/${city}`,
         }
     }
 }

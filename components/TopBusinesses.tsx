@@ -46,7 +46,7 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
         "Get Pricing"
     ]
 
-    const mainPhoneNumber = "+18588985338"
+    const mainPhoneNumber = "+13213420091"
 
     // Generate ItemList schema for SEO
     const itemListSchema = {
@@ -71,12 +71,17 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
                 "priceRange": "$$",
                 "areaServed": formattedCity
             }
-        }))
+        })),
+        "provider": {
+            "@type": "Organization",
+            "name": "Pipey Pro",
+            "url": "https://pipeypro.com"
+        }
     }
 
     return (
         <section
-            className="py-16 px-6 bg-gradient-to-b from-white to-slate-50 border-t border-slate-100"
+            className="py-16 px-6 bg-slate-50 border-t border-slate-200"
             itemScope
             itemType="https://schema.org/ItemList"
         >
@@ -86,18 +91,21 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
             />
 
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-10">
-                    <span className="text-blue-600 font-bold uppercase tracking-wider text-sm">Trusted Local Pros</span>
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-12 text-center md:text-left">
+                    <span className="text-blue-600 font-bold uppercase tracking-wider text-sm flex items-center justify-center md:justify-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                        Verified Local Pros
+                    </span>
                     <h2
-                        className="text-3xl font-bold text-slate-900 mt-2 mb-4"
+                        className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 mb-4"
                         itemProp="name"
                     >
-                        Top {leads.length} Best Gutter Service Providers Near Me in {formattedCity}, {stateUpper}
+                        Top {leads.length} Best Sump Pump Services Near Me in {formattedCity}, {stateUpper}
                     </h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto" itemProp="description">
-                        Looking for gutter installation near me in {formattedCity}? Connect with our vetted, top-rated
-                        local gutter contractors for cleaning, repair, and new installations.
+                    <p className="text-slate-600 max-w-2xl text-lg leading-relaxed" itemProp="description">
+                        Looking for sump pump installation near me in {formattedCity}? Connect with our vetted, top-rated
+                        local sump pump contractors for cleaning, repair, and new installations.
                     </p>
                 </div>
 

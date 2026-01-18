@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 // This should be called after deploying new content
 
 export async function POST() {
-    const sitemapUrl = 'https://usgutterinstallation.com/sitemap.xml'
+    const sitemapUrl = 'https://pipeypro.com/sitemap.xml'
 
     try {
         // Ping Google

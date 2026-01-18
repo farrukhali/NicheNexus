@@ -3,8 +3,7 @@ import Image from 'next/image'
 import Footer from '@/components/Footer'
 import { getSEOContent } from '@/lib/seo-content'
 import RelatedServices from '@/components/RelatedServices'
-import TrustBadges from '@/components/TrustBadges'
-import { CallBtn, FloatingCallBtn, NavbarCallBtn } from '@/components/CallBtn'
+import { CallBtn, NavbarCallBtn } from '@/components/CallBtn'
 import CoverageStats from '@/components/CoverageStats'
 import Breadcrumb from '@/components/Breadcrumb'
 import CityMap from '@/components/CityMap'
@@ -34,16 +33,16 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
 
     return (
         <div
-            className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-orange-500 selection:text-white"
+            className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500 selection:text-white"
             itemScope
-            itemType="https://schema.org/LocalBusiness"
+            itemType="https://schema.org/PlumbingService"
         >
 
             {/* Navigation (Transparent Glass) */}
             <nav className="fixed w-full z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        US Gutter Installation
+                        Pipey Pro
                     </Link>
                     <div className="flex items-center gap-6">
                         <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
@@ -70,17 +69,17 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         <div className="inline-block px-4 py-1.5 mb-6 rounded-full border border-blue-400/30 bg-blue-500/10 backdrop-blur-sm text-blue-300 text-sm font-semibold uppercase tracking-wider">
                             #1 Rated in {stateCode.toUpperCase()}
                         </div>
-                        <h1 className="text-5xl md:text-[4rem] font-extrabold text-white mb-8 leading-tight tracking-tight">
-                            Gutter Installation, Cleaning & Repair in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}, {stateCode.toUpperCase()} Near Me</span>
+                        <h1 className="text-4xl md:text-[3.5rem] font-extrabold text-white mb-8 leading-tight tracking-tight">
+                            Sump Pump Installation & Repair in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}, {stateCode.toUpperCase()}</span>
                         </h1>
-                        <div className="text-xl md:text-2xl text-slate-300 mb-10 font-light space-y-4">
+                        <div className="text-lg md:text-xl text-slate-300 mb-10 font-light space-y-4">
                             <p dangerouslySetInnerHTML={{ __html: content.intro.replace(/\*\*(.*?)\*\*/g, '<span class="text-white font-medium">$1</span>') }} />
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-                            <CallBtn className="py-4 px-10 text-lg w-full sm:w-auto transform hover:scale-105" label="Call Now" showNumber={true} />
+                            <CallBtn className="py-4 px-10 text-lg w-full sm:w-auto transform hover:scale-105" label="Call For Estimate" showNumber={true} />
                             <Link href="#cities" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold py-4 px-10 rounded-full text-lg transition-all w-full sm:w-auto text-center">
-                                View Locations
+                                View Service Areas
                             </Link>
                         </div>
                     </div>
@@ -90,15 +89,15 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         <div className="relative w-full aspect-square max-w-lg mx-auto">
                             {/* Decorative blob behind image */}
                             <div className="absolute inset-0 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-
-                            <Image
-                                src="/gutter-installation-hero.png"
-                                alt="Premium Gutter Installation"
-                                width={600}
-                                height={600}
-                                className="relative z-10 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-                                priority
-                            />
+                            {/* Placeholder for Sump Pump Image - Using a generic div/text if image missing, or a solid color block with text */}
+                            <div className="relative z-10 w-full h-full bg-slate-800 rounded-2xl flex items-center justify-center border border-slate-700 shadow-2xl overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-cyan-400/20"></div>
+                                <div className="text-center p-8">
+                                    <div className="text-6xl mb-4">💧</div>
+                                    <h3 className="text-2xl font-bold text-white mb-2">Pipey Pro</h3>
+                                    <p className="text-blue-200">Expert Sump Pump Services</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -117,21 +116,14 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         "@graph": [
                             // Organization Entity with full attributes
                             {
-                                "@type": "HomeAndConstructionBusiness",
-                                "@id": "https://usgutterinstallation.com/#organization",
-                                "name": "US Gutter Installation",
-                                "alternateName": "US Gutter Installation LLC",
-                                "legalName": "US Gutter Installation LLC",
-                                "description": "Professional gutter installation, repair, and maintenance services across 31,000+ cities in the United States. Licensed, insured, and EPA RRP certified.",
-                                "url": "https://usgutterinstallation.com",
-                                "logo": "https://usgutterinstallation.com/logo.png",
-                                "image": "https://usgutterinstallation.com/og-image.jpg",
-                                "telephone": "+1-858-898-5338",
-                                "email": "info@usgutterinstallation.com",
-                                "foundingDate": "2010",
+                                "@type": "PlumbingService",
+                                "@id": "https://pipeypro.com/#organization",
+                                "name": "Pipey Pro",
+                                "description": "Professional sump pump installation, repair, and basement waterproofing services across 31,000+ cities in the United States. Licensed, insured, and certified.",
+                                "url": "https://pipeypro.com",
+                                "logo": "https://pipeypro.com/logo.png",
+                                "telephone": "+13213420091",
                                 "priceRange": "$$",
-                                "currenciesAccepted": "USD",
-                                "paymentAccepted": "Cash, Credit Card, Check, Financing",
                                 "areaServed": {
                                     "@type": "Country",
                                     "name": "United States"
@@ -142,91 +134,23 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                                     "addressRegion": stateCode.toUpperCase(),
                                     "addressCountry": "US"
                                 },
-                                "geo": {
-                                    "@type": "GeoCoordinates",
-                                    "latitude": latitude || 37.0902,
-                                    "longitude": longitude || -95.7129
-                                },
                                 "aggregateRating": {
                                     "@type": "AggregateRating",
                                     "ratingValue": "4.9",
                                     "reviewCount": "2847",
                                     "bestRating": "5",
                                     "worstRating": "1"
-                                },
-                                "hasCredential": [
-                                    {
-                                        "@type": "EducationalOccupationalCredential",
-                                        "credentialCategory": "certification",
-                                        "name": "EPA RRP Lead-Safe Certified Firm"
-                                    },
-                                    {
-                                        "@type": "EducationalOccupationalCredential",
-                                        "credentialCategory": "certification",
-                                        "name": "OSHA 30-Hour Construction Safety"
-                                    },
-                                    {
-                                        "@type": "EducationalOccupationalCredential",
-                                        "credentialCategory": "license",
-                                        "name": `${stateCode.toUpperCase()} State Licensed Contractor`
-                                    }
-                                ],
-                                "hasOfferCatalog": {
-                                    "@type": "OfferCatalog",
-                                    "name": "Gutter Services",
-                                    "itemListElement": [
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Seamless Gutter Installation" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gutter Guards & Leaf Protection" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Gutter Cleaning & Maintenance" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Downspout Installation" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Soffit & Fascia Repair" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Copper Gutter Systems" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Commercial Gutter Services" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Storm Damage Repair" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Ice Dam Removal" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Underground Drain Solutions" } },
-                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Emergency Gutter Repair" } }
-                                    ]
-                                },
-                                "openingHoursSpecification": [
-                                    {
-                                        "@type": "OpeningHoursSpecification",
-                                        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                                        "opens": "07:00",
-                                        "closes": "19:00"
-                                    },
-                                    {
-                                        "@type": "OpeningHoursSpecification",
-                                        "dayOfWeek": "Saturday",
-                                        "opens": "08:00",
-                                        "closes": "17:00"
-                                    }
-                                ],
-                                "sameAs": [
-                                    "https://www.facebook.com/usgutterinstallation",
-                                    "https://www.instagram.com/usgutterinstallation",
-                                    "https://www.bbb.org/us/gutter-installation"
-                                ],
-                                "knowsAbout": [
-                                    "Seamless Gutter Installation",
-                                    "Gutter Guards",
-                                    "Gutter Cleaning",
-                                    "Gutter Repair",
-                                    "Downspout Installation",
-                                    "Soffit and Fascia Repair",
-                                    "Copper Gutters",
-                                    "Ice Dam Prevention"
-                                ]
+                                }
                             },
                             // Local Business Branch for this city
                             {
-                                "@type": "LocalBusiness",
-                                "@id": `https://usgutterinstallation.com/${stateCode}/${city}/#localbusiness`,
-                                "name": `US Gutter Installation - ${formattedCity}, ${stateCode.toUpperCase()}`,
-                                "description": `Professional gutter installation, repair, and maintenance in ${formattedCity}, ${stateCode.toUpperCase()}. Same-day quotes, licensed & insured.`,
-                                "url": `https://usgutterinstallation.com/${stateCode}/${city}`,
-                                "telephone": "+1-858-898-5338",
-                                "parentOrganization": { "@id": "https://usgutterinstallation.com/#organization" },
+                                "@type": "PlumbingService",
+                                "@id": `https://pipeypro.com/${stateCode}/${city}/#localbusiness`,
+                                "name": `Pipey Pro - ${formattedCity}, ${stateCode.toUpperCase()}`,
+                                "description": `Professional sump pump installation repair and waterproofing in ${formattedCity}, ${stateCode.toUpperCase()}. Same-day quotes, licensed & insured.`,
+                                "url": `https://pipeypro.com/${stateCode}/${city}`,
+                                "telephone": "+13213420091",
+                                "parentOrganization": { "@id": "https://pipeypro.com/#organization" },
                                 "address": {
                                     "@type": "PostalAddress",
                                     "addressLocality": formattedCity,
@@ -234,22 +158,9 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                                     "addressCountry": "US",
                                     "postalCode": zipCodes?.[0] || ""
                                 },
-                                "geo": {
-                                    "@type": "GeoCoordinates",
-                                    "latitude": latitude || 37.0902,
-                                    "longitude": longitude || -95.7129
-                                },
                                 "areaServed": {
                                     "@type": "City",
-                                    "name": formattedCity,
-                                    "containedInPlace": {
-                                        "@type": "State",
-                                        "name": formattedState,
-                                        "containedInPlace": {
-                                            "@type": "Country",
-                                            "name": "United States"
-                                        }
-                                    }
+                                    "name": formattedCity
                                 },
                                 "priceRange": "$$",
                                 "aggregateRating": {
@@ -262,68 +173,25 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                             // Service Schema for primary service
                             {
                                 "@type": "Service",
-                                "@id": `https://usgutterinstallation.com/${stateCode}/${city}/#service`,
-                                "name": `Gutter Installation Near Me in ${formattedCity}, ${stateCode.toUpperCase()}`,
-                                "serviceType": "Gutter Installation",
-                                "description": `Looking for gutter installation near me in ${formattedCity}, ${stateCode.toUpperCase()}? Complete gutter services including seamless gutter installation near me, gutter guards near me, gutter cleaning near me, and gutter repair near me.`,
-                                "provider": { "@id": `https://usgutterinstallation.com/${stateCode}/${city}/#localbusiness` },
+                                "@id": `https://pipeypro.com/${stateCode}/${city}/#service`,
+                                "name": `Sump Pump Installation Near Me in ${formattedCity}, ${stateCode.toUpperCase()}`,
+                                "serviceType": "Sump Pump Installation",
+                                "description": `Looking for sump pump installation near me in ${formattedCity}, ${stateCode.toUpperCase()}? Complete waterproofing services including battery backups, sewage ejectors, and french drains.`,
+                                "provider": { "@id": `https://pipeypro.com/${stateCode}/${city}/#localbusiness` },
                                 "areaServed": {
                                     "@type": "City",
                                     "name": formattedCity
                                 },
                                 "hasOfferCatalog": {
                                     "@type": "OfferCatalog",
-                                    "name": `Gutter Services in ${formattedCity}`,
+                                    "name": `Sump Pump Services in ${formattedCity}`,
                                     "itemListElement": [
-                                        {
-                                            "@type": "Offer",
-                                            "itemOffered": {
-                                                "@type": "Service",
-                                                "name": `Seamless Gutter Installation Near Me in ${formattedCity}`,
-                                                "description": `Custom-fit seamless aluminum gutters near me in ${formattedCity}. On-site fabrication.`
-                                            },
-                                            "priceSpecification": {
-                                                "@type": "PriceSpecification",
-                                                "priceCurrency": "USD",
-                                                "minPrice": "6",
-                                                "maxPrice": "12",
-                                                "unitText": "per linear foot"
-                                            }
-                                        },
-                                        {
-                                            "@type": "Offer",
-                                            "itemOffered": {
-                                                "@type": "Service",
-                                                "name": `Gutter Guards Near Me in ${formattedCity}`,
-                                                "description": `Micro-mesh leaf protection gutter guards near me in ${formattedCity}.`
-                                            },
-                                            "priceSpecification": {
-                                                "@type": "PriceSpecification",
-                                                "priceCurrency": "USD",
-                                                "minPrice": "10",
-                                                "maxPrice": "25",
-                                                "unitText": "per linear foot"
-                                            }
-                                        },
-                                        {
-                                            "@type": "Offer",
-                                            "itemOffered": {
-                                                "@type": "Service",
-                                                "name": `Gutter Cleaning Near Me in ${formattedCity}`,
-                                                "description": `Professional gutter cleaning near me in ${formattedCity}. Debris removal and downspout flushing.`
-                                            },
-                                            "priceSpecification": {
-                                                "@type": "PriceSpecification",
-                                                "priceCurrency": "USD",
-                                                "minPrice": "100",
-                                                "maxPrice": "250",
-                                                "unitText": "per service"
-                                            }
-                                        }
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Submersible Pump Installation" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Battery Backup Systems" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Sewage Ejector Pumps" } },
+                                        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Basement Waterproofing" } }
                                     ]
-                                },
-                                "termsOfService": "https://usgutterinstallation.com/terms",
-                                "serviceOutput": "Professional gutter system installation with lifetime warranty"
+                                }
                             }
                         ]
                     })
@@ -341,9 +209,9 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 <div className="max-w-7xl mx-auto">
                     <div className="grid md:grid-cols-3 gap-8 -mt-32">
                         {[
-                            { title: "Seamless Technology", desc: "Custom-fit on-site to eliminate leaks and improve aesthetics.", icon: "🔧" },
-                            { title: "Gutter Guards", desc: "Advanced micro-mesh protection to keep leaves and debris out forever.", icon: "🛡️" },
-                            { title: "Lifetime Warranty", desc: "We stand behind our materials and craftsmanship 100%.", icon: "✅" }
+                            { title: "Battery Backups", desc: "Never worry about power outages. Our backup systems keep your basement dry 24/7.", icon: "🔋" },
+                            { title: "Submersible Pumps", desc: "Quiet, high-efficiency pumps that handle heavy storm loads with ease.", icon: "💧" },
+                            { title: "Lifetime Warranty", desc: "We stand behind our pumps and installation workmanship 100%.", icon: "✅" }
                         ].map((feature, i) => (
                             <div key={i} className="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 hover:border-blue-100 transition-all hover:-translate-y-1">
                                 <div className="text-4xl mb-4">{feature.icon}</div>
@@ -359,7 +227,7 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
             <section className="py-20 px-6 bg-slate-50">
                 <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                     <div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
                             Why {formattedCity} Homeowners Trust Us
                         </h2>
                         <div className="text-lg text-slate-600 mb-6 leading-relaxed space-y-4">
@@ -375,12 +243,12 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
 
                         {/* Climate Considerations */}
                         <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 mb-6">
-                            <p className="text-sm text-amber-800 font-semibold mb-1">🌤️ {stateCode.toUpperCase()} Climate Considerations</p>
+                            <p className="text-sm text-amber-800 font-semibold mb-1">🌤️ {stateCode.toUpperCase()} Weather Alert</p>
                             <p className="text-sm text-amber-700">{content.climateConsiderations}</p>
                         </div>
 
                         <ul className="space-y-4 mb-8">
-                            {['Licensed & Insured in ' + stateCode.toUpperCase(), '5-Star Google Rated', 'Same-Day Quotes Available'].map((item, i) => (
+                            {['Licensed & Insured in ' + stateCode.toUpperCase(), '24/7 Emergency Service', 'Same-Day Quotes'].map((item, i) => (
                                 <li key={i} className="flex items-center text-slate-700 font-medium">
                                     <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-sm">✓</span>
                                     {item}
@@ -402,15 +270,14 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-3xl transform rotate-3 opacity-20"></div>
                         <div className="relative bg-white p-2 rounded-3xl shadow-2xl">
                             <div className="aspect-[4/3] bg-slate-200 rounded-2xl flex items-center justify-center overflow-hidden relative">
-                                <Image
-                                    src="/gutter-crew-local.jpeg"
-                                    alt={`Gutter installation in ${formattedCity}`}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                />
+                                <div className="absolute inset-0 bg-slate-800 flex items-center justify-center">
+                                    <div className="text-center text-white p-4">
+                                        <div className="text-5xl mb-2">🔧</div>
+                                        <p className="font-bold">Local Service in {formattedCity}</p>
+                                    </div>
+                                </div>
                                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
-                                    <p className="font-medium text-lg">Local Project: {formattedCity}</p>
+                                    <p className="font-medium text-lg">Project: {formattedCity}</p>
                                 </div>
                             </div>
                         </div>
@@ -444,10 +311,10 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 <section className="py-16 px-6 bg-slate-50 border-b border-slate-200">
                     <div className="max-w-6xl mx-auto">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                            Gutter Installation Near Me in Other {stateCode.toUpperCase()} Cities
+                            Sump Pump Services in Other {stateCode.toUpperCase()} Cities
                         </h2>
                         <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
-                            Looking for <strong>gutter contractors near me</strong> outside {formattedCity}? We serve these nearby {stateCode.toUpperCase()} communities with the same quality service.
+                            Looking for <strong>plumbers near me</strong> outside {formattedCity}? We serve these nearby {stateCode.toUpperCase()} communities with the same quality service.
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             {relatedCities.map((cityData, i) => (
@@ -455,9 +322,9 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                                     key={i}
                                     href={`/${cityData.state_id.toLowerCase()}/${cityData.city.toLowerCase().replace(/ /g, '-')}`}
                                     className="block p-3 bg-white rounded-lg shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all text-center text-slate-700 font-medium hover:text-blue-600"
-                                    title={`Gutter Installation in ${cityData.city}, ${cityData.state_id}`}
+                                    title={`Sump Pump Installation in ${cityData.city}, ${cityData.state_id}`}
                                 >
-                                    <span className="block text-xs text-slate-400 mb-1">Gutter Services</span>
+                                    <span className="block text-xs text-slate-400 mb-1">Service</span>
                                     {cityData.city}
                                 </Link>
                             ))}
@@ -471,7 +338,7 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-                            Complete Gutter Solutions in {formattedCity}
+                            Complete Waterproofing Solutions in {formattedCity}
                         </h2>
                         <p className="text-xl text-slate-600 max-w-2xl mx-auto">
                             {content.serviceDesc.replace(/\*\*(.*?)\*\*/g, '$1')}
@@ -481,29 +348,33 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     <div className="grid md:grid-cols-2 gap-8">
                         {[
                             {
-                                title: "Seamless Gutter Installation",
-                                desc: "Custom-fabricated on-site to fit your home perfectly. No seams means no leaks. Available in aluminum, copper, and steal.",
-                                bg: "bg-blue-50", text: "text-blue-600"
+                                title: "Sump Pump Installation",
+                                desc: "Expert installation of submersible and pedestal pumps. Right-sized for your basement to handle any storm.",
+                                bg: "bg-blue-50", text: "text-blue-600",
+                                icon: "💧"
                             },
                             {
-                                title: "Gutter Guards & Protection",
-                                desc: "Stop cleaning your gutters forever. We install premium micro-mesh guards that block pine needles, leaves, and roof grit.",
-                                bg: "bg-green-50", text: "text-green-600"
+                                title: "Battery Backup Systems",
+                                desc: "Never worry about power outages. Install reliable battery backup systems to keep your basement dry 24/7.",
+                                bg: "bg-green-50", text: "text-green-600",
+                                icon: "🔋"
                             },
                             {
-                                title: "Gutter Repair & Realignment",
-                                desc: "Fixing sagging, leaking, or detached gutters. We replace hangers, reseal corners, and adjust pitch for proper flow.",
-                                bg: "bg-orange-50", text: "text-orange-600"
+                                title: "Sewage Ejector Pumps",
+                                desc: "Installation and repair of sewage ejector pumps for basement bathrooms and laundry rooms.",
+                                bg: "bg-orange-50", text: "text-orange-600",
+                                icon: "🚽"
                             },
                             {
-                                title: "Downspout Extensions",
-                                desc: "Protect your foundation by moving water away from your home. We install buried drains and strategic extensions.",
-                                bg: "bg-purple-50", text: "text-purple-600"
+                                title: "Basement Waterproofing",
+                                desc: "Comprehensive solutions including french drains, vapor barriers, and foundation sealing.",
+                                bg: "bg-purple-50", text: "text-purple-600",
+                                icon: "🏠"
                             }
                         ].map((service, i) => (
                             <div key={i} className="flex gap-6 p-8 rounded-2xl bg-white border border-slate-100 hover:shadow-xl transition-shadow group">
                                 <div className={`w-16 h-16 rounded-xl ${service.bg} ${service.text} flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform`}>
-                                    {['🏠', '🛡️', '🔧', '💧'][i]}
+                                    {service.icon}
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
@@ -531,9 +402,9 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                         <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -z-10 hidden md:block"></div>
 
                         {[
-                            { step: "01", title: "Request Quote", desc: "Fill out our simple form. We'll contact you within 24 hours to schedule a quick measurement." },
-                            { step: "02", title: "Custom Fabrication", desc: "We arrive with our rolling gutter machine and craft your gutters right in your driveway." },
-                            { step: "03", title: "Professional Install", desc: "Most jobs are completed in just one day. We clean up thoroughly and haul away old materials." }
+                            { step: "01", title: "Diagnostic", desc: "We inspect your basement, check water tables, and identify the root cause of flooding or pump failure." },
+                            { step: "02", title: "Pump Selection", desc: "We recommend the perfect pump capacity and type for your specific home needs." },
+                            { step: "03", title: "Expert Install", desc: "Our licensed plumbers install your new system, test check valves, and ensure proper discharge." }
                         ].map((step, i) => (
                             <div key={i} className="bg-white p-8 pt-0 text-center">
                                 <div className="w-20 h-20 mx-auto bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg shadow-blue-200 mb-8 relative z-10">
@@ -547,15 +418,15 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 </div>
             </section>
 
-            {/* Local Expertise Section - Added for SEO */}
+            {/* Local Expertise Section */}
             <section className="py-20 px-6 bg-gradient-to-br from-blue-50 to-cyan-50">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                            Local Gutter Experts Serving {formattedCity} & Surrounding Areas
+                            Local Experts Serving {formattedCity} & Surrounding Areas
                         </h2>
                         <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                            When you search for <strong>gutter installation near me in {formattedCity}</strong>, you deserve contractors who truly understand your local area. Our {stateCode.toUpperCase()}-based crews have served thousands of homeowners across {formattedCity} and the surrounding communities.
+                            When you search for <strong>sump pump installation near me in {formattedCity}</strong>, you deserve contractors who truly understand your local area. Our {stateCode.toUpperCase()}-based crews have served thousands of homeowners across {formattedCity} and the surrounding communities.
                         </p>
                     </div>
 
@@ -566,23 +437,23 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                                 🏠 Neighborhoods We Serve in {formattedCity}
                             </h3>
                             <p className="text-slate-600 mb-4">
-                                Our <strong>gutter contractors near me in {formattedCity}</strong> cover all residential and commercial areas including downtown {formattedCity}, historic districts, new developments, and rural properties. Whether you live in an established neighborhood or a newly built subdivision, we bring our mobile gutter fabrication equipment directly to your driveway.
+                                Our <strong>sump pump repair near me in {formattedCity}</strong> specialists cover all residential zones including downtown, suburbs, and rural properties. We understand high water table zones and flood-prone areas in your community.
                             </p>
                             <p className="text-slate-600">
-                                We also serve surrounding {stateCode.toUpperCase()} communities within a 30-mile radius. Looking for <strong>seamless gutters near me</strong> outside city limits? Our crews regularly travel to nearby towns to provide the same quality service at competitive rates.
+                                We also serve surrounding {stateCode.toUpperCase()} communities within a 30-mile radius. Looking for <strong>plumbers near me</strong> outside city limits? Our crews regularly travel to nearby towns to provide the same quality service.
                             </p>
                         </div>
 
                         {/* Climate Expertise */}
                         <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
                             <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                                🌤️ {stateCode.toUpperCase()} Climate-Ready Gutter Systems
+                                🌤️ {stateCode.toUpperCase()} Storm-Ready Systems
                             </h3>
                             <p className="text-slate-600 mb-4">
-                                {stateCode.toUpperCase()} homeowners face unique weather challenges: {content.climateConsiderations}. That's why our <strong>gutter installation near me</strong> specialists design systems specifically engineered for local conditions—not generic one-size-fits-all solutions.
+                                {stateCode.toUpperCase()} homeowners face unique weather challenges: {content.climateConsiderations}. That's why our <strong>sump pump installation near me</strong> specialists design systems specifically engineered for local conditions.
                             </p>
                             <p className="text-slate-600">
-                                We recommend <strong>gutter guards near me</strong> installations that handle {stateCode.toUpperCase()}'s debris types, from leaves and pine needles to roof shingle grit. Our micro-mesh systems prevent clogs year-round, eliminating the need for dangerous ladder cleaning.
+                                We recommend <strong>battery backup sump pump</strong> installations that handle {stateCode.toUpperCase()}'s storms. Don't let a power outage flood your basement—get protected today.
                             </p>
                         </div>
                     </div>
@@ -590,25 +461,25 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     {/* Additional Local Content */}
                     <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 mb-8">
                         <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                            Why {formattedCity} Homeowners Choose Us for <span className="text-blue-600">Gutter Services Near Me</span>
+                            Why {formattedCity} Homeowners Choose Us for <span className="text-blue-600">Waterproofing Services</span>
                         </h3>
                         <div className="grid md:grid-cols-3 gap-6">
                             <div>
                                 <h4 className="font-bold text-slate-800 mb-2">🔧 Full-Service Solutions</h4>
                                 <p className="text-slate-600 text-sm">
-                                    From <strong>seamless gutter installation near me</strong> to <strong>gutter repair near me</strong>, we handle everything: gutter guards, downspout extensions, soffit and fascia repair, and emergency storm damage restoration.
+                                    From <strong>sump pump replacement</strong> to <strong>french drain installation</strong>, we handle everything: sewage pumps, check valves, discharge lines, and vapor barriers.
                                 </p>
                             </div>
                             <div>
                                 <h4 className="font-bold text-slate-800 mb-2">⭐ Trusted Local Reputation</h4>
                                 <p className="text-slate-600 text-sm">
-                                    With thousands of completed projects across {stateCode.toUpperCase()}, we're the <strong>gutter company near me</strong> that {formattedCity} residents recommend to neighbors and friends. Check our verified 5-star reviews online.
+                                    With thousands of completed projects across {stateCode.toUpperCase()}, we're the <strong>waterproofing company near me</strong> that {formattedCity} residents recommend.
                                 </p>
                             </div>
                             <div>
                                 <h4 className="font-bold text-slate-800 mb-2">💰 Transparent Local Pricing</h4>
                                 <p className="text-slate-600 text-sm">
-                                    When you search for <strong>gutter installation near me cost</strong>, you'll find our {formattedCity} pricing is competitive and straightforward—no hidden fees, no upsells, just honest quotes with lifetime warranties included.
+                                    When you search for <strong>sump pump cost</strong>, you'll find our {formattedCity} pricing is competitive and straightforward—no hidden fees, no upsells.
                                 </p>
                             </div>
                         </div>
@@ -617,19 +488,19 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     {/* Service Links with Strong Anchor Text */}
                     <div className="text-center">
                         <p className="text-slate-600 mb-4">
-                            Ready to get started with a <strong>gutter installation near me in {formattedCity}</strong>? Contact our local team today for a free, no-obligation estimate on any of our services.
+                            Ready to get started with a <strong>sump pump installation near me in {formattedCity}</strong>? Contact our local team today for a free, no-obligation estimate.
                         </p>
                         <div className="flex flex-wrap gap-3 justify-center">
-                            <Link href={`/${stateCode.toLowerCase()}/${city}/seamless-gutter-installation`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
-                                Seamless Gutters in {formattedCity}
+                            <Link href={`/${stateCode.toLowerCase()}/${city}/sump-pump-installation`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                                Sump Pump Installation {formattedCity}
                             </Link>
-                            <Link href={`/${stateCode.toLowerCase()}/${city}/gutter-guards-leaf-protection`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
-                                Gutter Guards Near Me
+                            <Link href={`/${stateCode.toLowerCase()}/${city}/battery-backup-systems`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                                Battery Backups Near Me
                             </Link>
-                            <Link href={`/${stateCode.toLowerCase()}/${city}/soffit-fascia-repair`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
-                                Soffit & Fascia Repair
+                            <Link href={`/${stateCode.toLowerCase()}/${city}/sewage-ejector-pumps`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                                Sewage Pumps
                             </Link>
-                            <Link href={`/${stateCode.toLowerCase()}/${city}/emergency-gutter-repair`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                            <Link href={`/${stateCode.toLowerCase()}/${city}/emergency-plumber`} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
                                 Emergency Repairs
                             </Link>
                             {/* Structured Data: FAQ + LocalBusiness + Breadcrumb */}
@@ -637,111 +508,19 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     </div>
                 </div>
             </section>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify([
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "FAQPage",
-                            "mainEntity": content.faqAnswers ? [
-                                {
-                                    "@type": "Question",
-                                    "name": `How much does gutter installation cost in ${formattedCity}?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.cost }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": `What are the best gutter guards for ${stateCode} weather?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.bestGuard }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": `How long does gutter installation take in ${formattedCity}?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.timeline }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": `How often should I clean my gutters in ${formattedCity}?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.cleaningFrequency }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": `Do you offer emergency gutter repair in ${formattedCity}?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.emergency }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": `Do you repair soffit and fascia boards?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.soffitFascia }
-                                },
-                                {
-                                    "@type": "Question",
-                                    "name": `Do you offer warranties on gutter installation?`,
-                                    "acceptedAnswer": { "@type": "Answer", "text": content.faqAnswers.warranty }
-                                }
-                            ] : []
-                        },
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "HomeAndConstructionBusiness",
-                            "name": `US Gutter Installation ${formattedCity}`,
-                            "image": "https://usgutterinstallation.com/og-image.jpg",
-                            "url": `https://usgutterinstallation.com/${stateCode.toLowerCase()}/${city.toLowerCase().replace(/ /g, '-')}`,
-                            "telephone": "+18588985338",
-                            "address": {
-                                "@type": "PostalAddress",
-                                "addressLocality": formattedCity,
-                                "addressRegion": stateCode,
-                                "addressCountry": "US"
-                            },
-                            "areaServed": {
-                                "@type": "City",
-                                "name": formattedCity
-                            },
-                            "priceRange": "$$"
-                        },
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "BreadcrumbList",
-                            "itemListElement": [
-                                {
-                                    "@type": "ListItem",
-                                    "position": 1,
-                                    "name": "Home",
-                                    "item": "https://usgutterinstallation.com"
-                                },
-                                {
-                                    "@type": "ListItem",
-                                    "position": 2,
-                                    "name": state,
-                                    "item": `https://usgutterinstallation.com/${stateCode.toLowerCase()}`
-                                },
-                                {
-                                    "@type": "ListItem",
-                                    "position": 3,
-                                    "name": formattedCity,
-                                    "item": `https://usgutterinstallation.com/${stateCode.toLowerCase()}/${city.toLowerCase().replace(/ /g, '-')}`
-                                }
-                            ]
-                        }
-                    ])
-                }}
-            />
+
             <section className="py-24 px-6 bg-slate-50">
                 <div className="max-w-4xl mx-auto">
                     <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Frequently Asked Questions in {formattedCity}</h2>
 
                     <div className="space-y-4">
                         {[
-                            { q: `How much does gutter installation cost in ${formattedCity}?`, a: content.faqAnswers.cost },
-                            { q: `What's the best gutter guard for ${stateCode.toUpperCase()} weather?`, a: content.faqAnswers.bestGuard },
-                            { q: `Do you offer emergency gutter repair in ${formattedCity}?`, a: content.faqAnswers.emergency },
-                            { q: `How often should gutters be cleaned in ${stateCode.toUpperCase()}?`, a: content.faqAnswers.cleaningFrequency },
-                            { q: `Do you repair soffit and fascia near me in ${formattedCity}?`, a: content.faqAnswers.soffitFascia },
+                            { q: `How much does sump pump installation cost in ${formattedCity}?`, a: content.faqAnswers.cost },
+                            { q: `What's the best battery backup for ${stateCode.toUpperCase()} storms?`, a: content.faqAnswers.bestGuard },
+                            { q: `Do you offer emergency sump pump repair in ${formattedCity}?`, a: content.faqAnswers.emergency },
+                            { q: `How often should I check my sump pump in ${stateCode.toUpperCase()}?`, a: content.faqAnswers.cleaningFrequency },
                             { q: "Do you offer warranties?", a: content.faqAnswers.warranty },
-                            { q: "Can you install gutters on any roof type?", a: "Absolutely. We have experience with asphalt shingles, metal roofs, slate, tile, and flat roofs." },
-                            { q: "How quickly can you get the job done?", a: content.faqAnswers.timeline }
+                            { q: "How quickly can you replace my pump?", a: content.faqAnswers.timeline }
                         ].map((faq, i) => (
                             <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                                 <h3 className="text-lg font-bold text-slate-900 mb-2">{faq.q}</h3>
@@ -760,9 +539,9 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                     </h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
-                            { name: "Michael R.", role: "Homeowner", text: "They came out the next day for a quote and installed everything on Saturday. Super clean work.", stars: 5 },
-                            { name: "Sarah J.", role: "Local Resident", text: "I was worried about the cost, but their quote was significantly lower than the other two I got. Highly recommend.", stars: 5 },
-                            { name: "David K.", role: "Business Owner", text: "Professional from start to finish. The seamless gutters look amazing on my Victorian home.", stars: 5 }
+                            { name: "Michael R.", role: "Homeowner", text: "My basement stayed completely dry during the last big storm thanks to their battery backup system. Lifesavers!", stars: 5 },
+                            { name: "Sarah J.", role: "Local Resident", text: "Fast response when my pump failed. The plumber was knowledgeable and fixed it in under an hour.", stars: 5 },
+                            { name: "David K.", role: "Business Owner", text: "Professional installation of a commercial ejector pump. Clean work and great pricing.", stars: 5 }
                         ].map((review, i) => (
                             <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                                 <div className="flex text-yellow-400 mb-4">
@@ -781,10 +560,10 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
 
             {/* CTA Section */}
             <section className="py-24 px-6 bg-slate-900 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+                <div className="absolute inset-0 opacity-5 bg-grid-slate-800"></div>
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-                        Ready to upgrade your home in {formattedCity}?
+                        Ready to protect your basement in {formattedCity}?
                     </h2>
                     <p className="text-blue-200 text-xl mb-10 max-w-2xl mx-auto">
                         Get a comprehensive quote in minutes. No obligation, just honest expert advice.
@@ -799,9 +578,6 @@ export default function ServicePage({ city, state, stateCode, zipCodes, relatedC
                 stateCode={stateCode}
                 relatedCities={relatedCities}
             />
-
-            <TrustBadges />
-            <Footer />
         </div>
     )
 }

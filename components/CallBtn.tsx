@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
-export const PHONE_NUMBER = "+1 (858) 898-5338"
-export const PHONE_HREF = "tel:+18588985338"
+export const PHONE_NUMBER = "+1 (321) 342-0091"
+export const PHONE_HREF = "tel:+13213420091"
 
 export function CallBtn({
     className = "",

@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 export const revalidate = 86400 // Cache for 1 day
 
 export async function GET() {
-    const baseUrl = 'https://usgutterinstallation.com'
+    const baseUrl = 'https://pipeypro.com'
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
 
     // Fetch all distinct states

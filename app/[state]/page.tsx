@@ -45,16 +45,16 @@ export async function generateMetadata(props: StatePageProps): Promise<Metadata>
     const stateName = cityData?.state_name || stateCode
 
     return {
-        title: `Gutter Installation Near Me in ${stateName} | Local Gutter Contractors`,
-        description: `Find gutter installation near me in ${stateName}. Connect with licensed local gutter contractors for seamless gutters, gutter guards, gutter cleaning, soffit & fascia repair. Free quotes in 24 hours!`,
-        keywords: `gutter installation near me ${stateName}, gutter companies near me ${stateName}, seamless gutters near me ${stateName}, gutter repair near me ${stateName}, gutter guards near me ${stateName}`,
+        title: `Sump Pump Installation Near Me in ${stateName} | Local Pros`,
+        description: `Find sump pump installation near me in ${stateName}. Connect with licensed local plumbers for sump pump repair, backup systems, and basement waterproofing. Free quotes!`,
+        keywords: `sump pump installation near me ${stateName}, sump pump repair near me ${stateName}, basement waterproofing ${stateName}, plumbing contractors ${stateName}, battery backup sump pump ${stateName}`,
         alternates: {
             canonical: `/${stateCode.toLowerCase()}`
         },
         openGraph: {
-            title: `Find Gutter Installation Near Me in ${stateName} | Local Experts`,
-            description: `Connect with top-rated gutter installers near you in ${stateName}. Seamless gutters, gutter guards, cleaning & repair with lifetime warranty. Get a free quote now.`,
-            url: `https://usgutterinstallation.com/${stateCode.toLowerCase()}`,
+            title: `Find Sump Pump Installation Near Me in ${stateName} | Local Experts`,
+            description: `Connect with top-rated waterproofing experts near you in ${stateName}. Repair, replacement, and backup installation. Get a free quote now.`,
+            url: `https://pipeypro.com/${stateCode.toLowerCase()}`,
             type: 'website'
         }
     }
@@ -80,7 +80,7 @@ export default async function StatePage(props: StatePageProps) {
                 <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm">
                     <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                         <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                            US Gutter Installation
+                            Pipey Pro
                         </Link>
                         <div className="flex items-center gap-6">
                             <div className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
@@ -103,10 +103,10 @@ export default async function StatePage(props: StatePageProps) {
                         Serving All of {stateName}
                     </div>
                     <h1 className="text-5xl md:text-[4rem] font-extrabold mb-6 tracking-tight">
-                        Gutter Installation in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{stateName}</span>
+                        Sump Pump Installation in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{stateName}</span>
                     </h1>
                     <p className="text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
-                        Find your local expert. We provide professional seamless gutter installation and repair services across {cities.length} cities in {stateCode.toUpperCase()}.
+                        Find your local expert. We provide professional sump pump installation, repair, and basement waterproofing across {cities.length} cities in {stateCode.toUpperCase()}.
                     </p>
 
                     <div className="mt-8 flex justify-center gap-4">
@@ -128,7 +128,7 @@ export default async function StatePage(props: StatePageProps) {
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Select Your City</h2>
                         <p className="text-slate-600 max-w-2xl mx-auto">
-                            Find top-rated gutter pros in {cities.length} {stateName} locations.
+                            Find top-rated sump pump and waterproofing pros in {cities.length} {stateName} locations.
                         </p>
                     </div>
 
@@ -160,17 +160,17 @@ export default async function StatePage(props: StatePageProps) {
 
                 {/* Benefits Section */}
                 <section className="mt-20 text-center max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-12">Why Choose US Gutter Installation in {stateName}?</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-12">Why Choose Pipey Pro in {stateName}?</h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
                             <div className="text-4xl mb-4">🛡️</div>
                             <h3 className="font-bold text-lg mb-2">Local Experts</h3>
-                            <p className="text-slate-600 text-sm">Our teams are based right here in {stateName}, understanding local weather patterns.</p>
+                            <p className="text-slate-600 text-sm">Our teams are based right here in {stateName}, understanding local water tables and flooding risks.</p>
                         </div>
                         <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
                             <div className="text-4xl mb-4">⚡</div>
                             <h3 className="font-bold text-lg mb-2">Fast Response</h3>
-                            <p className="text-slate-600 text-sm">Same-day quotes available for most {stateName} zip codes.</p>
+                            <p className="text-slate-600 text-sm">Same-day emergency service available for most {stateName} zip codes.</p>
                         </div>
                         <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
                             <div className="text-4xl mb-4">⭐</div>

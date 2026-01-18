@@ -50,10 +50,10 @@ export default function AuthoritySignals({ stateCode, city }: AuthoritySignalsPr
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                        Why Trust US Gutter Installation in {city}?
+                        Why Trust Pipey Pro in {city}?
                     </h2>
                     <p className="text-slate-600 text-sm max-w-2xl mx-auto">
-                        We're not just contractors—we're licensed, certified professionals with industry-leading credentials
+                        We're not just contractors—we're licensed, certified waterproofing experts
                     </p>
                 </div>
 
@@ -79,7 +79,7 @@ export default function AuthoritySignals({ stateCode, city }: AuthoritySignalsPr
                         __html: JSON.stringify({
                             "@context": "https://schema.org",
                             "@type": "Organization",
-                            "name": "US Gutter Installation",
+                            "name": "Pipey Pro",
                             "hasCredential": [
                                 {
                                     "@type": "EducationalOccupationalCredential",

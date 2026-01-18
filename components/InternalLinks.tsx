@@ -18,14 +18,14 @@ export default function InternalLinks({ currentCity, stateCode, relatedCities }:
         <section className="py-12 px-6 bg-slate-100 border-t border-slate-200">
             <div className="max-w-6xl mx-auto">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 text-center">
-                    Gutter Services in Nearby {stateCode} Cities
+                    Sump Pump Services in Nearby {stateCode} Cities
                 </h2>
 
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Primary Internal Links - Nearby Cities */}
                     <div>
                         <h3 className="font-semibold text-slate-800 mb-3">
-                            Gutter Installation Near {currentCity}
+                            Sump Pump Installation Near {currentCity}
                         </h3>
                         <ul className="space-y-2">
                             {nearbyLinks.map((city, i) => {
@@ -36,7 +36,7 @@ export default function InternalLinks({ currentCity, stateCode, relatedCities }:
                                             href={`/${city.state_id.toLowerCase()}/${citySlug}`}
                                             className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
                                         >
-                                            Gutter Installation in {city.city}, {city.state_id}
+                                            Sump Pump Installation in {city.city}, {city.state_id}
                                         </Link>
                                     </li>
                                 )
@@ -59,7 +59,7 @@ export default function InternalLinks({ currentCity, stateCode, relatedCities }:
                                                 href={`/${city.state_id.toLowerCase()}/${citySlug}`}
                                                 className="text-slate-600 hover:text-blue-600 hover:underline text-sm"
                                             >
-                                                {city.city} Gutter Services
+                                                {city.city} Sump Pump Services
                                             </Link>
                                         </li>
                                     )
