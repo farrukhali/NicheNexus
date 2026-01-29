@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase'
-import { servicesData } from '@/lib/services-data'
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
 
-export const revalidate = 86400 // Cache for 1 day
+export const revalidate = 3600 // Cache for 1 hour
 
 // Priority services (most searched)
 const PRIORITY_SERVICES = [
@@ -16,8 +17,10 @@ export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
+    const baseUrl = `https://${siteConfig.domain}`
     const { id } = await params
-    const baseUrl = 'https://usgutterinstallation.com'
     const today = new Date().toISOString().split('T')[0]
 
     // 1. Handle Static Sitemap
@@ -100,11 +103,12 @@ export async function GET(
         // Only include priority services for top 100 cities (saves crawl budget)
         const includeAllServices = index < 100
         const servicesToInclude = includeAllServices
-            ? Object.values(servicesData)
-            : Object.values(servicesData).filter(s => PRIORITY_SERVICES.includes(s.slug))
+            ? niche.services
+            : niche.services.slice(0, 3) // Just top 3 for smaller cities
 
-        const serviceUrls = servicesToInclude.map(service => {
-            const servicePriority = PRIORITY_SERVICES.includes(service.slug) ? '0.6' : '0.5'
+        const serviceUrls = servicesToInclude.map((service: any) => {
+            const isPriority = index < 50
+            const servicePriority = isPriority ? '0.6' : '0.5'
             return `
     <url>
         <loc>${baseUrl}/${stateCode.toLowerCase()}/${citySlug}/${service.slug}</loc>

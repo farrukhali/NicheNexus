@@ -2,64 +2,47 @@ import Link from 'next/link'
 import Footer from '@/components/Footer'
 import { NavbarCallBtn } from '@/components/CallBtn'
 import TrustBadges from '@/components/TrustBadges'
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
 
-export const metadata = {
-    title: 'About US Gutter Installation | America\'s Trusted Gutter Experts',
-    description: 'Learn about US Gutter Installation - a BBB A+ rated company serving communities nationwide. Our licensed, insured professionals specialize in seamless gutter installation, gutter guards, and repairs.',
+export async function generateMetadata() {
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
+    return {
+        title: `About ${siteConfig.siteName} | Trusted ${niche.name} Experts`,
+        description: `Learn about ${siteConfig.siteName} - serving communities nationwide. Our licensed, insured professionals specialize in ${niche.primaryService.toLowerCase()} and repairs.`,
+    }
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
+
     const organizationSchema = {
         "@context": "https://schema.org",
         "@type": "HomeAndConstructionBusiness",
-        "name": "US Gutter Installation",
-        "alternateName": "US Gutter Services",
-        "url": "https://usgutterinstallation.com",
-        "logo": "https://usgutterinstallation.com/logo.png",
-        "foundingDate": "2015",
-        "description": "America's leading gutter installation service provider, protecting homes from water damage with licensed, insured professionals nationwide.",
+        "name": siteConfig.siteName,
+        "url": `https://${siteConfig.domain}`,
+        "description": `${siteConfig.siteName} is a leading ${niche.name.toLowerCase()} service provider, protecting homes with licensed, insured professionals nationwide.`,
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "123 Gutter Lane",
+            "streetAddress": "123 Main St",
             "addressLocality": "San Diego",
             "addressRegion": "CA",
             "postalCode": "92101",
             "addressCountry": "US"
         },
-        "telephone": "+18588985338",
-        "email": "support@usgutterinstallation.com",
-        "sameAs": [
-            "https://www.facebook.com/usgutterinstallation",
-            "https://www.instagram.com/usgutterinstallation"
-        ],
+        "telephone": siteConfig.contactPhone,
+        "email": siteConfig.contactEmail,
         "areaServed": {
             "@type": "Country",
             "name": "United States"
         },
-        "numberOfEmployees": {
-            "@type": "QuantitativeValue",
-            "minValue": 500,
-            "maxValue": 1000
-        },
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.9",
-            "reviewCount": "12547",
-            "bestRating": "5",
-            "worstRating": "1"
-        },
-        "hasCredential": [
-            {
-                "@type": "EducationalOccupationalCredential",
-                "credentialCategory": "Professional Certification",
-                "name": "Licensed Contractor Network"
-            },
-            {
-                "@type": "EducationalOccupationalCredential",
-                "credentialCategory": "Business Accreditation",
-                "name": "BBB A+ Rating"
-            }
-        ]
+            "reviewCount": "12547"
+        }
     }
 
     return (
@@ -72,7 +55,7 @@ export default function AboutPage() {
             <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        US Gutter Installation
+                        {siteConfig.siteName}
                     </Link>
                     <div className="flex items-center gap-6">
                         <Link href="/" className="hidden md:block text-sm font-medium text-slate-600 hover:text-blue-600">
@@ -87,11 +70,11 @@ export default function AboutPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
                         <span className="inline-block px-4 py-1.5 mb-4 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-sm font-semibold">
-                            Established 2015 • 1M+ Linear Feet Installed
+                            Trusted Local Experts • Nationwide Coverage
                         </span>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">About US Gutter Installation</h1>
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">About {siteConfig.siteName}</h1>
                         <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                            America's most trusted seamless gutter & leaf protection network, connecting homeowners with licensed experts since 2015.
+                            America's most trusted {niche.name.toLowerCase()} network, connecting homeowners with licensed experts.
                         </p>
                     </div>
 
@@ -110,7 +93,7 @@ export default function AboutPage() {
                             <div className="text-sm text-slate-300">Customer Rating</div>
                         </div>
                         <div>
-                            <div className="text-3xl font-bold text-cyan-400">9 Years</div>
+                            <div className="text-3xl font-bold text-cyan-400">10+ Years</div>
                             <div className="text-sm text-slate-300">Industry Experience</div>
                         </div>
                     </div>
@@ -122,10 +105,10 @@ export default function AboutPage() {
                                 <span className="text-blue-600">📖</span> Our Story
                             </h2>
                             <p>
-                                US Gutter Installation was founded in <strong>2015</strong> with a single mission: to protect homes from water damage. We realized that many homeowners underestimate the importance of a properly functioning gutter system until they see water damage on their siding or foundation.
+                                {siteConfig.siteName} was founded with a single mission: to provide homeowners with reliable, professional {niche.name.toLowerCase()} services. We realized that many homeowners struggle to find trustworthy local contractors for specialized home improvement projects.
                             </p>
                             <p className="mt-4">
-                                What started as a local gutter crew has grown into <strong>America's largest specialty gutter network</strong>. We focus exclusively on seamless gutters, gutter guards, and downspout systems, ensuring every installation is done right the first time.
+                                What started as a small team has grown into <strong>America's largest specialty home service network</strong>. We focus exclusively on high-quality {niche.name.toLowerCase()} and related repairs, ensuring every project is handled with precision and care.
                             </p>
                         </section>
 
@@ -140,15 +123,15 @@ export default function AboutPage() {
                             <ul className="list-none space-y-3 mt-4">
                                 <li className="flex items-start gap-3">
                                     <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-1">✓</span>
-                                    <span><strong>Licensed Contractors</strong> with specialized training in drainage systems</span>
+                                    <span><strong>Licensed Contractors</strong> with specialized training in {niche.name.toLowerCase()}</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-1">✓</span>
-                                    <span><strong>Fully insured</strong> with $1M+ liability coverage and workers' compensation</span>
+                                    <span><strong>Fully insured</strong> with comprehensive liability coverage and workers' compensation</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-1">✓</span>
-                                    <span><strong>Certified Installers</strong> for leading material brands</span>
+                                    <span><strong>Certified Pros</strong> using premium materials and equipment</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-1">✓</span>
@@ -157,43 +140,15 @@ export default function AboutPage() {
                             </ul>
                         </section>
 
-                        {/* Our Certifications */}
-                        <section className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                            <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="text-blue-600">🏆</span> Certifications & Accreditations
-                            </h2>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div className="bg-white p-4 rounded-xl border border-blue-100">
-                                    <div className="font-bold text-slate-900">BBB A+ Rating</div>
-                                    <div className="text-sm text-slate-600">Better Business Bureau Accredited since 2017</div>
-                                </div>
-                                <div className="bg-white p-4 rounded-xl border border-blue-100">
-                                    <div className="font-bold text-slate-900">Licensed Contractors</div>
-                                    <div className="text-sm text-slate-600">Network of state-licensed professionals</div>
-                                </div>
-                                <div className="bg-white p-4 rounded-xl border border-blue-100">
-                                    <div className="font-bold text-slate-900">EPA Lead-Safe Certified</div>
-                                    <div className="text-sm text-slate-600">Commitment to safe renovation practices</div>
-                                </div>
-                                <div className="bg-white p-4 rounded-xl border border-blue-100">
-                                    <div className="font-bold text-slate-900">Home Advisor Elite</div>
-                                    <div className="text-sm text-slate-600">Top-rated service professional status</div>
-                                </div>
-                            </div>
-                        </section>
-
                         {/* Contact Info */}
                         <section>
                             <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="text-blue-600">📍</span> Corporate Headquarters
+                                <span className="text-blue-600">📍</span> Get In Touch
                             </h2>
                             <address className="not-italic text-slate-700">
-                                <strong>US Gutter Installation, LLC</strong><br />
-                                123 Gutter Lane<br />
-                                San Diego, CA 92101<br />
-                                United States<br /><br />
-                                <strong>Phone:</strong> <a href="tel:+18588985338" className="text-blue-600 hover:underline">+1 (858) 898-5338</a><br />
-                                <strong>Email:</strong> <a href="mailto:support@usgutterinstallation.com" className="text-blue-600 hover:underline">support@usgutterinstallation.com</a>
+                                <strong>{siteConfig.siteName}</strong><br />
+                                <strong>Phone:</strong> <a href={`tel:${siteConfig.contactPhone}`} className="text-blue-600 hover:underline">{siteConfig.contactPhone}</a><br />
+                                <strong>Email:</strong> <a href={`mailto:${siteConfig.contactEmail}`} className="text-blue-600 hover:underline">{siteConfig.contactEmail}</a>
                             </address>
                         </section>
                     </div>

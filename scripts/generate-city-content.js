@@ -1,4 +1,3 @@
-
 const { createClient } = require('@supabase/supabase-js')
 const dotenv = require('dotenv')
 const path = require('path')
@@ -9,6 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.local') })
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY
+const NICHE_SLUG = process.env.NEXT_PUBLIC_NICHE_SLUG || 'gutter'
 
 if (!SUPABASE_URL || !SUPABASE_KEY || !OPENROUTER_KEY) {
     console.error('Missing required environment variables.')
@@ -18,9 +18,8 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !OPENROUTER_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 async function generateIntro(city, state) {
-    const prompt = `Write a unique, engaging, and professional 100-word introduction for a Gutter Installation service page in ${city}, ${state}. 
-    Focus on local relevance, citing specific weather patterns like heavy rain, snowmelt, or storms common to ${state}. 
-    Mention "seamless gutters", "gutter guards", and "gutter cleaning" naturally. 
+    const prompt = `Write a unique, engaging, and professional 100-word introduction for a ${NICHE_SLUG} service page in ${city}, ${state}. 
+    Focus on local relevance, citing specific weather patterns or conditions common to ${state}. 
     Do not use generic fluff. Make it sound like a local expert writing it.
     Return ONLY the text paragraph, no quotes or markdown.`
 
@@ -34,7 +33,7 @@ async function generateIntro(city, state) {
             body: JSON.stringify({
                 "model": "google/gemini-2.0-flash-exp:free",
                 "messages": [
-                    { "role": "system", "content": "You are a professional SEO copywriter for a gutter installation company." },
+                    { "role": "system", "content": `You are a professional SEO copywriter for a ${NICHE_SLUG} company.` },
                     { "role": "user", "content": prompt }
                 ]
             })
@@ -51,16 +50,14 @@ async function generateIntro(city, state) {
 }
 
 async function processCities() {
-    console.log("Fetching cities without SEO content...")
+    console.log(`Fetching cities for niche: ${NICHE_SLUG}...`)
 
-    // Fetch top 5 cities by population that don't have an intro yet
-    // Note: We assume 'seo_intro' column exists (run migration first!)
     const { data: cities, error } = await supabase
         .from('usa city name')
         .select('id, city, state_id, state_name')
         .is('seo_intro', null)
-        .order('id', { ascending: true }) // Deterministic order
-        .limit(5) // Start small to test
+        .order('id', { ascending: true })
+        .limit(5)
 
     if (error) {
         console.error("Error fetching cities:", error)
@@ -85,11 +82,8 @@ async function processCities() {
             } else {
                 console.log(`✅ Updated ${city.city}`)
             }
-        } else {
-            console.log(`Skipped ${city.city} (Generation failed)`)
         }
 
-        // Brief pause to avoid rate limits
         await new Promise(r => setTimeout(r, 1000))
     }
 }

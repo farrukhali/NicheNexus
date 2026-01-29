@@ -1,8 +1,8 @@
 // IndexNow API Integration for Faster Indexing
 // This notifies Bing/Yandex instantly when pages are updated
+import { getSiteConfig } from './site-config'
 
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY || 'your-indexnow-key-here'
-const SITE_URL = 'https://usgutterinstallation.com'
 
 interface IndexNowResponse {
     success: boolean
@@ -10,6 +10,9 @@ interface IndexNowResponse {
 }
 
 export async function notifyIndexNow(urls: string[]): Promise<IndexNowResponse> {
+    const siteConfig = await getSiteConfig()
+    const SITE_URL = `https://${siteConfig.domain}`
+
     if (!INDEXNOW_KEY || INDEXNOW_KEY === 'your-indexnow-key-here') {
         console.log('IndexNow key not configured')
         return { success: false, message: 'IndexNow key not configured' }
@@ -22,7 +25,7 @@ export async function notifyIndexNow(urls: string[]): Promise<IndexNowResponse> 
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                host: SITE_URL.replace('https://', ''),
+                host: siteConfig.domain,
                 key: INDEXNOW_KEY,
                 keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`,
                 urlList: urls.slice(0, 10000), // Max 10k URLs per request
@@ -45,6 +48,8 @@ export async function notifyIndexNow(urls: string[]): Promise<IndexNowResponse> 
 
 // Batch submit URLs for a state
 export async function submitStateUrls(stateCode: string, cities: string[]): Promise<IndexNowResponse> {
+    const siteConfig = await getSiteConfig()
+    const SITE_URL = `https://${siteConfig.domain}`
     const urls = [
         `${SITE_URL}/${stateCode}`, // State page
         ...cities.map(city => `${SITE_URL}/${stateCode}/${city.toLowerCase().replace(/\s+/g, '-')}`),
@@ -54,6 +59,8 @@ export async function submitStateUrls(stateCode: string, cities: string[]): Prom
 
 // Submit priority pages
 export async function submitPriorityPages(): Promise<IndexNowResponse> {
+    const siteConfig = await getSiteConfig()
+    const SITE_URL = `https://${siteConfig.domain}`
     const priorityUrls = [
         SITE_URL,
         `${SITE_URL}/about`,

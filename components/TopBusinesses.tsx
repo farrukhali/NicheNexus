@@ -5,7 +5,12 @@ interface TopBusinessesProps {
     state: string
 }
 
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
+
 export default async function TopBusinesses({ city, state }: TopBusinessesProps) {
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
     const supabaseUrl = process.env.LEADS_SUPABASE_URL
     const supabaseKey = process.env.LEADS_SUPABASE_SERVICE_ROLE_KEY
 
@@ -52,15 +57,15 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
     const itemListSchema = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": `Top ${leads.length} Best Gutter Service Providers Near Me in ${formattedCity}, ${stateUpper}`,
-        "description": `Find the best gutter installation, cleaning, and repair service providers near me in ${formattedCity}, ${stateUpper}. Verified local contractors.`,
+        "name": `Top ${leads.length} Best ${niche.name} Providers Near Me in ${formattedCity}, ${stateUpper}`,
+        "description": `Find the best ${niche.primaryService.toLowerCase()} professionals near me in ${formattedCity}, ${stateUpper}. Verified local contractors.`,
         "numberOfItems": leads.length,
         "itemListElement": leads.map((lead: any, index: number) => ({
             "@type": "ListItem",
             "position": index + 1,
             "item": {
                 "@type": "LocalBusiness",
-                "name": lead.company_name || lead.name || "Local Gutter Pro",
+                "name": lead.company_name || lead.name || `Local ${niche.name} Pro`,
                 "address": {
                     "@type": "PostalAddress",
                     "streetAddress": lead.address || "",
@@ -74,8 +79,8 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
         })),
         "provider": {
             "@type": "Organization",
-            "name": "US Gutter Installation",
-            "url": "https://usgutterinstallation.com"
+            "name": siteConfig.siteName,
+            "url": `https://${siteConfig.domain}`
         }
     }
 
@@ -101,11 +106,11 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
                         className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 mb-4"
                         itemProp="name"
                     >
-                        Top {leads.length} Best Gutter Installation Services Near Me in {formattedCity}, {stateUpper}
+                        Top {leads.length} Best {niche.name} Services Near Me in {formattedCity}, {stateUpper}
                     </h2>
                     <p className="text-slate-600 max-w-2xl text-lg leading-relaxed" itemProp="description">
-                        Looking for gutter installation near me in {formattedCity}? Connect with our vetted, top-rated
-                        local gutter contractors for cleaning, repair, and new installations.
+                        Looking for {niche.primaryService.toLowerCase()} near me in {formattedCity}? Connect with our vetted, top-rated
+                        local {niche.name.toLowerCase()} contractors for all your needs.
                     </p>
                 </div>
 
@@ -134,7 +139,7 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
                                             {index + 1}
                                         </td>
                                         <td className="py-4 px-6 font-medium text-slate-900" itemProp="name">
-                                            {lead.company_name || lead.name || "Local Gutter Pro"}
+                                            {lead.company_name || lead.name || `Local ${niche.name} Pro`}
                                         </td>
                                         <td className="py-4 px-6 text-slate-500 text-sm hidden sm:table-cell" itemProp="address">
                                             {lead.address || `${formattedCity}, ${stateUpper}`}

@@ -1,0 +1,52 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { execSync } from 'child_process';
+import { existsSync, readFileSync, unlinkSync } from 'fs';
+import path from 'path';
+
+export async function GET(req: NextRequest) {
+    // 1. Check for basic auth or admin session if needed
+    // For now, we assume development/local use as requested
+
+    const outDir = path.join(process.cwd(), 'out');
+    const zipPath = path.join(process.cwd(), 'site_export.zip');
+
+    // 2. Check if build exists
+    if (!existsSync(outDir)) {
+        return NextResponse.json(
+            { error: 'Build directory (out) not found. Please run npm run build first.' },
+            { status: 404 }
+        );
+    }
+
+    try {
+        // 3. Create ZIP using system command (fastest for many files)
+        console.log('Starting ZIP process...');
+        // Change to 'out' directory and zip everything inside
+        execSync(`cd "${outDir}" && zip -r "${zipPath}" ./*`);
+
+        if (!existsSync(zipPath)) {
+            throw new Error('ZIP file was not created');
+        }
+
+        // 4. Read file and create response
+        const fileContent = readFileSync(zipPath);
+
+        // 5. Cleanup ZIP from local storage after reading
+        unlinkSync(zipPath);
+
+        // 6. Return as downloadable file
+        return new NextResponse(fileContent, {
+            headers: {
+                'Content-Type': 'application/zip',
+                'Content-Disposition': 'attachment; filename="site_export.zip"',
+            },
+        });
+
+    } catch (error: any) {
+        console.error('ZIP Export Error:', error);
+        return NextResponse.json(
+            { error: 'Failed to create ZIP: ' + error.message },
+            { status: 500 }
+        );
+    }
+}

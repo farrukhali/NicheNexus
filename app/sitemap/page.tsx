@@ -2,19 +2,27 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import Footer from '@/components/Footer'
 import { Metadata } from 'next'
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
 
 export const revalidate = 86400 // Daily revalidation
 
-export const metadata: Metadata = {
-    title: 'Site Directory | US Gutter Installation',
-    description: 'Browse our complete directory of Gutter Installation and Repair services by state and city.',
-    robots: {
-        index: true,
-        follow: true
+export async function generateMetadata(): Promise<Metadata> {
+    const siteConfig = await getSiteConfig()
+    return {
+        title: `Site Directory | ${siteConfig.siteName}`,
+        description: `Browse our complete directory of services by state and city.`,
+        robots: {
+            index: true,
+            follow: true
+        }
     }
 }
 
 export default async function SitemapPage() {
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
+
     // efficient fetch of distinct states
     const { data: cities } = await supabase
         .from('usa city name')
@@ -29,7 +37,7 @@ export default async function SitemapPage() {
             <nav className="bg-white border-b border-slate-200 py-4 px-6">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        US Gutter Installation
+                        {siteConfig.siteName}
                     </Link>
                     <Link href="/" className="text-sm font-medium text-slate-600 hover:text-blue-600">
                         Back to Home
@@ -41,7 +49,7 @@ export default async function SitemapPage() {
                 <header className="mb-12">
                     <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Site Directory</h1>
                     <p className="text-lg text-slate-600 max-w-2xl">
-                        Find local gutter installation and repair experts in your area. Browse by state below.
+                        Find local {niche.name.toLowerCase()} experts in your area. Browse by state below.
                     </p>
                 </header>
 

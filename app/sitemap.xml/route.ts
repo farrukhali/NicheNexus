@@ -1,9 +1,11 @@
 import { supabase } from '@/lib/supabase'
+import { getSiteConfig } from '@/lib/site-config'
 
-export const revalidate = 86400 // Cache for 1 day
+export const revalidate = 3600 // Cache for 1 hour
 
 export async function GET() {
-    const baseUrl = 'https://usgutterinstallation.com'
+    const siteConfig = await getSiteConfig()
+    const baseUrl = `https://${siteConfig.domain}`
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
 
     // Fetch all distinct states

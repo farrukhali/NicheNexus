@@ -1,12 +1,15 @@
 import Link from 'next/link'
-import { servicesData } from '@/lib/services-data'
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
 
 interface RelatedServicesProps {
     city?: string
     state?: string
 }
 
-export default function RelatedServices({ city, state }: RelatedServicesProps) {
+export default async function RelatedServices({ city, state }: RelatedServicesProps) {
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
     const locationText = city && state ? `in ${city}, ${state}` : 'in your area'
 
     return (
@@ -14,15 +17,15 @@ export default function RelatedServices({ city, state }: RelatedServicesProps) {
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
                     <span className="text-blue-600 font-bold uppercase tracking-wider text-sm">Comprehensive Coverage</span>
-                    <h2 className="text-3xl font-bold text-slate-900 mt-2">Complete Gutter Protection</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 mt-2">Professional {niche.name} Services</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {Object.values(servicesData).map((service, index) => {
+                    {niche.services.map((service, index) => {
                         const citySlug = city?.toLowerCase().replace(/ /g, '-')
-                        // If we are on a city page, link to service page. Otherwise link to phone.
+                        // If we are on a city page, link to service page. Otherwise link to homepage/states
                         const isCityContext = city && state
-                        const linkHref = isCityContext ? `/${state?.toLowerCase()}/${citySlug}/${service.slug}` : 'tel:+18588985338'
+                        const linkHref = isCityContext ? `/${state?.toLowerCase()}/${citySlug}/${service.slug}` : 'tel:' + (siteConfig.contactPhone || '')
 
                         return (
                             <div key={index} className="flex flex-col h-full bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
@@ -40,7 +43,11 @@ export default function RelatedServices({ city, state }: RelatedServicesProps) {
                                 </div>
 
                                 <p className="text-slate-600 text-sm mb-6 flex-grow">
-                                    {city && state ? service.description(city, state) : `Professional ${service.title.toLowerCase()} services.`}
+                                    {city && state ? (
+                                        `Looking for ${service.title.toLowerCase()} in ${city}, ${state}? Our professional local experts provide top-quality ${service.title.toLowerCase()} near me.`
+                                    ) : (
+                                        `Professional ${service.title.toLowerCase()} services and ${niche.name.toLowerCase()} solutions.`
+                                    )}
                                 </p>
 
                                 {isCityContext ? (
@@ -48,8 +55,8 @@ export default function RelatedServices({ city, state }: RelatedServicesProps) {
                                         Learn More
                                     </Link>
                                 ) : (
-                                    <a href={linkHref} className="mt-auto w-full block text-center bg-white border border-blue-200 text-blue-600 font-semibold py-2.5 rounded-xl hover:bg-blue-600 hover:text-white transition-colors">
-                                        Call Now
+                                    <a href={linkHref || 'tel:'} className="mt-auto w-full block text-center bg-white border border-blue-200 text-blue-600 font-semibold py-2.5 rounded-xl hover:bg-blue-600 hover:text-white transition-colors">
+                                        Call for Free Quote
                                     </a>
                                 )}
                             </div>

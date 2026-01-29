@@ -2,19 +2,26 @@ import Link from 'next/link'
 import Footer from '@/components/Footer'
 import { NavbarCallBtn, CallBtn } from '@/components/CallBtn'
 import TrustBadges from '@/components/TrustBadges'
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
 
-export const metadata = {
-    title: 'Contact US Gutter Installation | Get a Free Quote Today',
-    description: 'Contact our team for questions about seamless gutter installation, gutter guards, or to schedule a free estimate in your city.',
+export async function generateMetadata() {
+    const siteConfig = await getSiteConfig()
+    return {
+        title: `Contact ${siteConfig.siteName} | Get a Free Quote Today`,
+        description: `Contact our team for questions about local services or to schedule a free estimate in your city.`,
+    }
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+    const siteConfig = await getSiteConfig()
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
             <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500">
-                        US Gutter Installation
+                        {siteConfig.siteName}
                     </Link>
                     <NavbarCallBtn />
                 </div>
@@ -33,7 +40,7 @@ export default function ContactPage() {
                             <p className="text-slate-600 mb-8">
                                 For immediate quotes and scheduling, please call our 24/7 hotline. We have agents ready to connect you with a local pro.
                             </p>
-                            <CallBtn className="w-full py-4 text-lg" label="Call Sales: +1 (858) 898-5338" />
+                            <CallBtn className="w-full py-4 text-lg" label={`Call Sales: ${siteConfig.contactPhone}`} />
 
                             <div className="mt-8 pt-8 border-t border-slate-100">
                                 <h3 className="font-bold mb-2">Hours of Operation</h3>
@@ -45,13 +52,13 @@ export default function ContactPage() {
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Email Support</h3>
                                 <p className="text-slate-600 mb-1">For non-urgent inquiries:</p>
-                                <a href="mailto:support@usgutterinstallation.com" className="text-blue-600 font-semibold hover:underline">support@usgutterinstallation.com</a>
+                                <a href={`mailto:${siteConfig.contactEmail}`} className="text-blue-600 font-semibold hover:underline">{siteConfig.contactEmail}</a>
                             </div>
 
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Corporate Office</h3>
                                 <p className="text-slate-600">
-                                    123 Gutter Lane<br />
+                                    123 Main St<br />
                                     San Diego, CA<br />
                                     United States
                                 </p>
@@ -62,7 +69,7 @@ export default function ContactPage() {
                                 <p className="text-blue-700 text-sm mb-4">
                                     The fastest way to get a price is to find your city page and call the local number or use the main hotline.
                                 </p>
-                                <Link href="/#states" className="text-blue-600 font-bold hover:underline text-sm">
+                                <Link href="/sitemap" className="text-blue-600 font-bold hover:underline text-sm">
                                     Find Your City &rarr;
                                 </Link>
                             </div>

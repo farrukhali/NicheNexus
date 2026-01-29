@@ -6,6 +6,9 @@ export interface ServiceDetail {
     heroImage: string
     features: string[]
     benefits: string[]
+    process?: string[]
+    materials?: { name: string; description: string }[]
+    faqs?: { question: string; answer: string }[]
 }
 
 export const servicesData: Record<string, ServiceDetail> = {

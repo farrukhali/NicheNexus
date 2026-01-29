@@ -1,7 +1,9 @@
 import { MetadataRoute } from 'next'
+import { getSiteConfig } from '@/lib/site-config'
 
-export default function robots(): MetadataRoute.Robots {
-    const baseUrl = 'https://usgutterinstallation.com'
+export default async function robots(): Promise<MetadataRoute.Robots> {
+    const siteConfig = await getSiteConfig()
+    const baseUrl = `https://${siteConfig.domain}`
 
     return {
         rules: {

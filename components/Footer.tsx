@@ -1,49 +1,93 @@
 import Link from 'next/link'
-import { PHONE_NUMBER, PHONE_HREF } from './CallBtn'
+import { getSiteConfig } from '@/lib/site-config'
+import { getNicheConfig } from '@/lib/niche-configs'
+import { Facebook, Instagram, Twitter, Linkedin, Phone, Mail, MapPin } from 'lucide-react'
 
-export default function Footer() {
+export default async function Footer() {
     const currentYear = new Date().getFullYear()
+    const siteConfig = await getSiteConfig()
+    const niche = await getNicheConfig(siteConfig.nicheSlug)
+
+    const socialLinks = [
+        { url: siteConfig.facebookUrl, icon: Facebook, label: 'Facebook' },
+        { url: siteConfig.instagramUrl, icon: Instagram, label: 'Instagram' },
+        { url: siteConfig.twitterUrl, icon: Twitter, label: 'Twitter' },
+        { url: siteConfig.linkedinUrl, icon: Linkedin, label: 'LinkedIn' },
+    ].filter(link => link.url)
 
     return (
-        <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800">
-            <div className="max-w-7xl mx-auto px-6 text-center md:text-left">
-                <div className="grid md:grid-cols-4 gap-8 mb-8">
-                    <div>
-                        <h4 className="text-white font-bold text-lg mb-4">US Gutter Installation</h4>
-                        <p className="text-sm mb-4">America&apos;s trusted gutter installation partner. Connecting homeowners with local experts nationwide.</p>
-                        <a href={PHONE_HREF} className="text-xl font-bold text-white hover:text-blue-500 transition-colors flex items-center gap-2">
-                            📞 {PHONE_NUMBER}
-                        </a>
+        <footer className="bg-slate-950 text-slate-400 py-16 border-t border-slate-900">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="grid md:grid-cols-4 gap-12 mb-12">
+                    <div className="col-span-1 md:col-span-1">
+                        {siteConfig.logoUrl ? (
+                            <img src={siteConfig.logoUrl} alt={siteConfig.siteName} className="h-10 mb-6 brightness-0 invert" />
+                        ) : (
+                            <h4 className="text-white font-bold text-xl mb-6">{siteConfig.siteName}</h4>
+                        )}
+                        <p className="text-sm mb-6 leading-relaxed">
+                            {siteConfig.footerTagline || `Your trusted ${niche.name.toLowerCase()} partner. Connecting homeowners with local experts nationwide.`}
+                        </p>
+                        <div className="flex gap-4">
+                            {socialLinks.map((link, i) => (
+                                <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors text-slate-500">
+                                    <link.icon size={20} />
+                                </a>
+                            ))}
+                        </div>
                     </div>
+
                     <div>
-                        <h4 className="text-white font-bold text-lg mb-4">Quick Links</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/" className="hover:text-white transition-colors">Find Your City</Link></li>
-                            <li><Link href="/#states" className="hover:text-white transition-colors">Browse States</Link></li>
-                            <li><Link href="/" className="hover:text-white transition-colors">Get A Quote</Link></li>
-                            <li><Link href="/sitemap" className="hover:text-white transition-colors">Site Directory</Link></li>
+                        <h4 className="text-white font-bold text-lg mb-6">Contact Us</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li>
+                                <a href={`tel:${siteConfig.contactPhone}`} className="hover:text-blue-500 transition-colors flex items-center gap-3">
+                                    <Phone size={16} className="text-blue-500" /> {siteConfig.contactPhone}
+                                </a>
+                            </li>
+                            <li>
+                                <a href={`mailto:${siteConfig.contactEmail}`} className="hover:text-blue-500 transition-colors flex items-center gap-3">
+                                    <Mail size={16} className="text-blue-500" /> {siteConfig.contactEmail}
+                                </a>
+                            </li>
+                            {siteConfig.businessAddress && (
+                                <li className="flex gap-3">
+                                    <MapPin size={16} className="text-blue-500 shrink-0 mt-0.5" />
+                                    <span>
+                                        {siteConfig.businessAddress}<br />
+                                        {siteConfig.businessCity}, {siteConfig.businessState} {siteConfig.businessZip}
+                                    </span>
+                                </li>
+                            )}
                         </ul>
                     </div>
+
                     <div>
-                        <h4 className="text-white font-bold text-lg mb-4">Services</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><span className="cursor-default">Seamless Gutters</span></li>
-                            <li><span className="cursor-default">Gutter Guards</span></li>
-                            <li><span className="cursor-default">Gutter Repair</span></li>
-                            <li><span className="cursor-default">Gutter Cleaning</span></li>
+                        <h4 className="text-white font-bold text-lg mb-6">Services</h4>
+                        <ul className="space-y-3 text-sm">
+                            {niche.services.slice(0, 5).map((service, i) => (
+                                <li key={i}><span className="cursor-default hover:text-white transition-colors">{service.title}</span></li>
+                            ))}
                         </ul>
                     </div>
+
                     <div>
-                        <h4 className="text-white font-bold text-lg mb-4">Support</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
-                            <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                        <h4 className="text-white font-bold text-lg mb-6">Explore</h4>
+                        <ul className="space-y-3 text-sm">
+                            <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
                             <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+                            <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+                            <li><Link href="/sitemap" className="hover:text-white transition-colors">Site Directory</Link></li>
+                            <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                         </ul>
                     </div>
                 </div>
-                <div className="border-t border-slate-800 pt-8 text-center text-sm">
-                    &copy; {currentYear} US Gutter Installation. All rights reserved.
+                <div className="border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
+                    <p>&copy; {currentYear} {siteConfig.siteName}. All rights reserved.</p>
+                    <div className="flex gap-6">
+                        <Link href="/privacy" className="hover:text-slate-400">Privacy</Link>
+                        <Link href="/contact" className="hover:text-slate-400">Terms</Link>
+                    </div>
                 </div>
             </div>
         </footer>

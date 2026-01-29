@@ -4,7 +4,7 @@ import ServicePage from '@/components/ServicePage'
 import { Metadata } from 'next'
 
 // Allow ISR
-export const revalidate = 3600
+export const revalidate = 60 // Refresh every minute
 export const dynamicParams = true
 
 import { getCityData, getRelatedCities } from '@/lib/data-fetching'
@@ -16,9 +16,8 @@ interface PageProps {
     }>
 }
 
-import { getMetaTitle } from '@/lib/state-meta-patterns'
-
-// ... existing imports ...
+import { getSEOContent } from '@/lib/seo-content'
+import { getSiteConfig } from '@/lib/site-config'
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const params = await props.params
@@ -32,19 +31,19 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const stateCode = cityData?.state_id || state.toUpperCase()
     const stateName = cityData?.state_name || stateCode
 
-    const metaTitle = getMetaTitle(formattedCity, stateCode, stateName)
+    const seo = await getSEOContent(formattedCity, stateName, stateCode)
 
     return {
-        title: `Gutter Installation Near Me in ${formattedCity}, ${stateCode} | Local Pros`,
-        description: `Looking for gutter installation near me in ${formattedCity}, ${stateCode}? Find licensed local contractors for seamless gutters, gutter guards, and repairs. Free quote!`,
-        keywords: `gutter installation near me ${formattedCity}, seamless gutters near me ${formattedCity} ${stateCode}, gutter guards near me ${formattedCity}, gutter repair near me ${formattedCity}, gutter cleaning near me ${formattedCity}, downspout installation near me ${formattedCity}, leaf guards ${formattedCity}`,
+        title: seo.metaTitle,
+        description: seo.metaDescription,
+        keywords: `${seo.metaKeywords}, ${formattedCity}, ${stateCode}`,
         alternates: {
             canonical: `/${state.toLowerCase()}/${city.toLowerCase()}`
         },
         openGraph: {
-            title: `Find Gutter Installation Near Me in ${formattedCity}, ${stateCode}`,
-            description: `Connect with the #1 rated gutter installation contractors near you in ${formattedCity}. Seamless gutters, repairs, and guards. 24/7 Service. Free quotes!`,
-            url: `https://usgutterinstallation.com/${state}/${city}`,
+            title: seo.metaTitle,
+            description: seo.metaDescription,
+            url: `https://${(await getSiteConfig()).domain}/${state}/${city}`,
         }
     }
 }
