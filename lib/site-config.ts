@@ -85,21 +85,22 @@ export interface SiteConfig {
 export const getSiteConfig = async (): Promise<SiteConfig> => {
     // 1. Try resolving by Domain (Host Header)
     let host = ''
+    let lookupDomain = ''
     try {
         const headersList = await headers()
         // Prioritize x-forwarded-host (common behind proxies like Coolify/Nginx)
         host = headersList.get('x-forwarded-host') || headersList.get('host') || ''
-        // Remove port if present (e.g., localhost:3000 -> localhost)
-        if (host.includes(':')) host = host.split(':')[0]
+        // Remove port for DB lookup (e.g., localhost:3000 -> localhost)
+        lookupDomain = host.split(':')[0]
     } catch (e) {
         // Headers might not be available in all contexts (e.g. static gen), ignore
     }
 
-    if (host && host !== 'localhost') {
+    if (lookupDomain && lookupDomain !== 'localhost') {
         const { data, error } = await supabase
             .from('site_configs')
             .select('*')
-            .eq('domain', host)
+            .eq('domain', lookupDomain)
             .single()
 
         if (data && !error) {
@@ -127,6 +128,7 @@ export const getSiteConfig = async (): Promise<SiteConfig> => {
     return {
         domain: host || process.env.NEXT_PUBLIC_SITE_DOMAIN || "localhost",
         nicheSlug: nicheSlugFromEnv,
+
         siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Professional Services",
         contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "(555) 000-0000",
         contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "info@example.com",

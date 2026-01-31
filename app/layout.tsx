@@ -18,6 +18,22 @@ const geistMono = Geist_Mono({
   display: 'swap',
 });
 
+import { headers } from 'next/headers';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteConfig = await getSiteConfig();
+  const domain = siteConfig.domain;
+  const protocol = domain.includes('localhost') ? 'http' : 'https';
+  const baseUrl = `${protocol}://${domain}`;
+
+  return {
+    metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical: '/',
+    },
+  }
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{

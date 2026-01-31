@@ -9,7 +9,8 @@ export const revalidate = 3600
  */
 export async function GET() {
     const siteConfig = await getSiteConfig()
-    const baseUrl = `https://${siteConfig.domain}`
+    const protocol = siteConfig.domain.includes('localhost') ? 'http' : 'https'
+    const baseUrl = `${protocol}://${siteConfig.domain}`
     const now = new Date().toISOString().split('T')[0]
 
     const staticPages = [

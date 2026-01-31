@@ -27,7 +27,8 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     const siteConfig = await getSiteConfig()
     const niche = await getNicheConfig(siteConfig.nicheSlug)
-    const baseUrl = `https://${siteConfig.domain}`
+    const protocol = siteConfig.domain.includes('localhost') ? 'http' : 'https'
+    const baseUrl = `${protocol}://${siteConfig.domain}`
     const now = new Date().toISOString().split('T')[0]
 
     try {
