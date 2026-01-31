@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { getSEOContent } from '@/lib/seo-content'
 
 // Generic Revalidation (ISR)
 export const revalidate = 60 // Refresh every minute
@@ -21,21 +22,22 @@ export async function generateMetadata(props: StartServicePageProps): Promise<Me
     const params = await props.params
     const { state, city, service } = params
     const siteConfig = await getSiteConfig()
-    const niche = await getNicheConfig(siteConfig.nicheSlug)
 
-    // Validate Service from Niche
-    const serviceInfo = niche.services.find(s => s.slug === service)
-    if (!serviceInfo) return {}
-
-    // Format City/State
     const formattedCity = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     const formattedState = state.toUpperCase()
 
+    const seo = await getSEOContent({
+        city: formattedCity,
+        state: formattedState,
+        pageType: 'service',
+        serviceSlug: service
+    })
+
     return {
-        title: `${serviceInfo.title} in ${formattedCity}, ${formattedState} | ${siteConfig.siteName}`,
-        description: `Looking for professional ${serviceInfo.title.toLowerCase()} in ${formattedCity}, ${formattedState}? ${serviceInfo.description}`,
+        title: seo.metaTitle,
+        description: seo.metaDescription,
         alternates: {
-            canonical: `/${state.toLowerCase()}/${city.toLowerCase()}/${service}`
+            canonical: `https://${siteConfig.domain}/${state.toLowerCase()}/${city.toLowerCase()}/${service}`
         }
     }
 }
@@ -71,8 +73,8 @@ export default async function Page(props: StartServicePageProps) {
             ...serviceInfo,
             description: (city: string, state: string) => `Searching for ${serviceInfo.title.toLowerCase()} near me in ${city}, ${state}? ${serviceInfo.description}`,
             heroImage: serviceInfo.heroImage || (serviceInfo as any).hero_image || 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80',
-            features: [],
-            benefits: [],
+            features: (serviceInfo as any).features || [],
+            benefits: (serviceInfo as any).benefits || [],
             process: (serviceInfo as any).process || [],
             materials: (serviceInfo as any).materials || [],
             faqs: (serviceInfo as any).faqs || []

@@ -1,4 +1,50 @@
 import { supabase } from './supabase'
+import { headers } from 'next/headers'
+
+// SEO Settings Interface
+export interface SEOSettings {
+    ga4_measurement_id?: string
+    gtm_container_id?: string
+    search_console_verification?: string
+    h1_template_home?: string
+    h1_template_state?: string
+    h1_template_city?: string
+    h1_template_service?: string
+    meta_title_home?: string
+    meta_description_home?: string
+    meta_title_state?: string
+    meta_description_state?: string
+    meta_title_city?: string
+    meta_description_city?: string
+    meta_title_service?: string
+    meta_description_service?: string
+    og_image_url?: string
+    favicon_url?: string
+    sitemap_enabled?: boolean
+    sitemap_update_frequency?: string
+}
+
+// Expert/Author Settings Interface
+export interface ExpertSettings {
+    name?: string
+    title?: string
+    bio?: string
+    photo_url?: string
+    license_number?: string
+    years_experience?: number
+    certifications?: string[]
+}
+
+// Trust Signals Interface
+export interface TrustSignals {
+    years_in_business?: number
+    average_rating?: number
+    total_reviews?: number
+    projects_completed?: number
+    warranty_details?: string
+    certifications?: string[]
+    service_guarantee?: string
+}
 
 export interface SiteConfig {
     domain: string;
@@ -23,48 +69,59 @@ export interface SiteConfig {
     // Branding
     footerTagline?: string;
     logoUrl?: string;
+    // AI Settings
+    aiSettings?: {
+        model: string;
+        promptTemplate: string;
+    };
+    // SEO Settings
+    seoSettings?: SEOSettings;
+    // Expert/Author Settings
+    expertSettings?: ExpertSettings;
+    // Trust Signals
+    trustSignals?: TrustSignals;
 }
 
 export const getSiteConfig = async (): Promise<SiteConfig> => {
-    // Try fetching from Supabase first
+    // 1. Try resolving by Domain (Host Header)
+    let host = ''
+    try {
+        const headersList = await headers()
+        host = headersList.get('host') || ''
+        // Remove port if present (e.g., localhost:3000 -> localhost)
+        if (host.includes(':')) host = host.split(':')[0]
+    } catch (e) {
+        // Headers might not be available in all contexts (e.g. static gen), ignore
+    }
+
+    if (host) {
+        const { data, error } = await supabase
+            .from('site_configs')
+            .select('*')
+            .eq('domain', host)
+            .single()
+
+        if (data && !error) {
+            return mapConfigData(data)
+        }
+    }
+
+    // 2. Fallback: Fetch by Niche Slug (from ENV)
     try {
         const { data, error } = await supabase
             .from('site_configs')
             .select('*')
-            .limit(1)
+            .eq('niche_slug', (process.env.NEXT_PUBLIC_NICHE_SLUG || 'gutter').toLowerCase())
             .single()
 
         if (data && !error) {
-            return {
-                domain: data.domain,
-                nicheSlug: data.niche_slug,
-                siteName: data.site_name,
-                contactPhone: data.contact_phone,
-                contactEmail: data.contact_email,
-                gscId: data.gsc_id,
-                ga4Id: data.ga4_id,
-                clarityId: data.clarity_id,
-                openRouterKey: data.open_router_key,
-                // Business Address
-                businessAddress: data.business_address,
-                businessCity: data.business_city,
-                businessState: data.business_state,
-                businessZip: data.business_zip,
-                // Social Media
-                facebookUrl: data.facebook_url,
-                instagramUrl: data.instagram_url,
-                twitterUrl: data.twitter_url,
-                linkedinUrl: data.linkedin_url,
-                // Branding
-                footerTagline: data.footer_tagline,
-                logoUrl: data.logo_url,
-            }
+            return mapConfigData(data)
         }
     } catch (e) {
         console.warn('DB Config Fetch Failed, falling back to ENV', e)
     }
 
-    // Fallback to Environment Variables
+    // 3. Last Resort: Environment Variables
     return {
         domain: process.env.NEXT_PUBLIC_SITE_DOMAIN || "localhost",
         nicheSlug: (process.env.NEXT_PUBLIC_NICHE_SLUG || "gutter").toLowerCase(),
@@ -77,3 +134,35 @@ export const getSiteConfig = async (): Promise<SiteConfig> => {
         openRouterKey: process.env.OPENROUTER_API_KEY,
     };
 };
+
+// Helper to map DB response to SiteConfig interface
+function mapConfigData(data: any): SiteConfig {
+    return {
+        domain: data.domain,
+        nicheSlug: data.niche_slug,
+        siteName: data.site_name,
+        contactPhone: data.contact_phone,
+        contactEmail: data.contact_email,
+        gscId: data.gsc_id,
+        ga4Id: data.ga4_id,
+        clarityId: data.clarity_id,
+        openRouterKey: data.open_router_key,
+        // Business Address
+        businessAddress: data.business_address,
+        businessCity: data.business_city,
+        businessState: data.business_state,
+        businessZip: data.business_zip,
+        // Social Media
+        facebookUrl: data.facebook_url,
+        instagramUrl: data.instagram_url,
+        twitterUrl: data.twitter_url,
+        linkedinUrl: data.linkedin_url,
+        // Branding
+        footerTagline: data.footer_tagline,
+        logoUrl: data.logo_url,
+        aiSettings: data.ai_settings || { model: 'openai/gpt-4o-mini', promptTemplate: '' },
+        seoSettings: data.seo_settings || {},
+        expertSettings: data.expert_settings || {},
+        trustSignals: data.trust_signals || {}
+    }
+}

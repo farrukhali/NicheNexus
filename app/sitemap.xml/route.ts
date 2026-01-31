@@ -1,57 +1,81 @@
+import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { getSiteConfig } from '@/lib/site-config'
 
-export const revalidate = 3600 // Cache for 1 hour
+export const revalidate = 3600 // Regenerate every hour
+export const dynamic = 'force-dynamic'
 
+/**
+ * SITEMAP INDEX
+ * 
+ * /sitemap.xml (This route)
+ *   ├── /sitemap/static.xml (Homepage, About, Contact, etc.)
+ *   ├── /sitemap/az.xml (Arizona cities + services)
+ *   ├── /sitemap/ca.xml (California cities + services)
+ *   └── ... (each state has its own sitemap)
+ */
 export async function GET() {
     const siteConfig = await getSiteConfig()
     const baseUrl = `https://${siteConfig.domain}`
-    const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+    const now = new Date().toISOString().split('T')[0]
 
-    // Fetch all distinct states
-    const { data: cities } = await supabase
-        .from('usa city name')
-        .select('state_id')
+    try {
+        // Get all unique states
+        const { data: statesData } = await supabase
+            .from('usa city name')
+            .select('state_id')
 
-    if (!cities) {
-        return new Response('<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>', {
-            headers: { 'Content-Type': 'application/xml' }
-        })
-    }
+        const sitemapEntries: string[] = []
 
-    const uniqueStates = Array.from(new Set(cities.map(c => c.state_id))).sort()
+        // Add static sitemap
+        sitemapEntries.push(`  <sitemap>
+    <loc>${baseUrl}/sitemap/static.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>`)
 
-    // Priority order for sitemaps:
-    // 1. Static pages (highest priority)
-    // 2. States A-F (common states like CA, FL, TX)
-    // 3. States G-M
-    // 4. States N-Z
+        if (statesData) {
+            const uniqueStates = [...new Set(statesData.map(item => item.state_id))]
+                .filter(Boolean)
+                .sort()
 
-    const priorityStates = ['CA', 'TX', 'FL', 'NY', 'PA', 'IL', 'OH', 'GA', 'NC', 'MI'] // High population states
-    const otherStates = uniqueStates.filter(s => !priorityStates.includes(s))
+            // Add a sitemap for each state
+            uniqueStates.forEach(stateId => {
+                sitemapEntries.push(`  <sitemap>
+    <loc>${baseUrl}/sitemap/${stateId.toLowerCase()}.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>`)
+            })
+        }
 
-    const sitemapIndexXML = `<?xml version="1.0" encoding="UTF-8"?>
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <sitemap>
-        <loc>${baseUrl}/sitemap/static.xml</loc>
-        <lastmod>${today}</lastmod>
-    </sitemap>
-    ${priorityStates.filter(s => uniqueStates.includes(s)).map(state => `
-    <sitemap>
-        <loc>${baseUrl}/sitemap/${state.toLowerCase()}.xml</loc>
-        <lastmod>${today}</lastmod>
-    </sitemap>`).join('')}
-    ${otherStates.map(state => `
-    <sitemap>
-        <loc>${baseUrl}/sitemap/${state.toLowerCase()}.xml</loc>
-        <lastmod>${today}</lastmod>
-    </sitemap>`).join('')}
+${sitemapEntries.join('\n')}
 </sitemapindex>`
 
-    return new Response(sitemapIndexXML, {
-        headers: {
-            'Content-Type': 'application/xml',
-            'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-        },
-    })
+        console.log(`Generated sitemap index with ${sitemapEntries.length} sitemaps`)
+
+        return new NextResponse(xml, {
+            headers: {
+                'Content-Type': 'application/xml',
+                'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+            },
+        })
+    } catch (error) {
+        console.error('Sitemap index generation error:', error)
+
+        // Return minimal sitemap index on error
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${baseUrl}/sitemap/static.xml</loc>
+    <lastmod>${now}</lastmod>
+  </sitemap>
+</sitemapindex>`
+
+        return new NextResponse(xml, {
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+        })
+    }
 }

@@ -1,6 +1,6 @@
 /**
  * Replaces placeholders in a given text with dynamic variables.
- * Supported placeholders: {{city}}, {{state}}, {{stateCode}}, {{niche}}, {{service}}
+ * Supported placeholders: {{city}}, {{state}}, {{stateCode}}, {{niche}}, {{nicheName}}, {{service}}
  */
 export function replacePlaceholders(
     text: string | null | undefined,
@@ -9,6 +9,7 @@ export function replacePlaceholders(
         state?: string;
         stateCode?: string;
         niche?: string;
+        nicheName?: string;
         service?: string;
     }
 ): string {
@@ -22,6 +23,7 @@ export function replacePlaceholders(
         "{{state}}": vars.state,
         "{{stateCode}}": vars.stateCode,
         "{{niche}}": vars.niche,
+        "{{nicheName}}": vars.nicheName || vars.niche,
         "{{service}}": vars.service,
     };
 

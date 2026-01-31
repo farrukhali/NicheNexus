@@ -11,6 +11,9 @@ export async function generateMetadata() {
     return {
         title: `About ${siteConfig.siteName} | Trusted ${niche.name} Experts`,
         description: `Learn about ${siteConfig.siteName} - serving communities nationwide. Our licensed, insured professionals specialize in ${niche.primaryService.toLowerCase()} and repairs.`,
+        alternates: {
+            canonical: `https://${siteConfig.domain}/about`
+        }
     }
 }
 
@@ -24,13 +27,17 @@ export default async function AboutPage() {
         "name": siteConfig.siteName,
         "url": `https://${siteConfig.domain}`,
         "description": `${siteConfig.siteName} is a leading ${niche.name.toLowerCase()} service provider, protecting homes with licensed, insured professionals nationwide.`,
-        "address": {
+        "address": siteConfig.businessAddress ? {
             "@type": "PostalAddress",
-            "streetAddress": "123 Main St",
-            "addressLocality": "San Diego",
-            "addressRegion": "CA",
-            "postalCode": "92101",
+            "streetAddress": siteConfig.businessAddress,
+            "addressLocality": siteConfig.businessCity,
+            "addressRegion": siteConfig.businessState,
+            "postalCode": siteConfig.businessZip,
             "addressCountry": "US"
+        } : {
+            "@type": "PostalAddress",
+            "addressCountry": "US",
+            "addressRegion": "Nationwide"
         },
         "telephone": siteConfig.contactPhone,
         "email": siteConfig.contactEmail,

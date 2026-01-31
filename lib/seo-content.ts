@@ -100,31 +100,123 @@ import { getSiteConfig } from './site-config'
 import { getNicheConfig } from './niche-configs'
 import { generateAIContent } from './ai-content'
 
-export async function getSEOContent(city: string, state: string, stateCode?: string): Promise<ContentVars> {
+// ... imports remain the same
+
+export interface ContentVars {
+    intro: string
+    serviceDesc: string
+    whyChoose: string
+    processIntro: string
+    materials: string
+    technicalSpecs: string
+    climateConsiderations: string
+    faqAnswers: { [key: string]: string }
+    h1Title?: string // New field
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string[]
+}
+
+// ... existing code ...
+
+export interface SEOContentOptions {
+    city: string
+    state: string
+    stateCode?: string
+    pageType?: 'home' | 'state' | 'city' | 'service'
+    serviceSlug?: string
+}
+
+// Overload signatures to maintain backward compatibility
+export async function getSEOContent(city: string, state: string, stateCode?: string): Promise<ContentVars>;
+export async function getSEOContent(options: SEOContentOptions): Promise<ContentVars>;
+
+export async function getSEOContent(
+    cityOrOptions: string | SEOContentOptions,
+    stateArg?: string,
+    stateCodeArg?: string
+): Promise<ContentVars> {
+    let city: string, state: string, stateCode: string | undefined;
+    let pageType: 'home' | 'state' | 'city' | 'service' = 'city'; // Default to city for backward compat
+    let serviceSlug: string | undefined;
+
+    if (typeof cityOrOptions === 'object') {
+        city = cityOrOptions.city;
+        state = cityOrOptions.state;
+        stateCode = cityOrOptions.stateCode;
+        pageType = cityOrOptions.pageType || 'city';
+        serviceSlug = cityOrOptions.serviceSlug;
+    } else {
+        city = cityOrOptions;
+        state = stateArg!;
+        stateCode = stateCodeArg;
+    }
+
     const siteConfig = await getSiteConfig()
     const niche = await getNicheConfig(siteConfig.nicheSlug)
     const code = stateCode?.toUpperCase() || state.substring(0, 2).toUpperCase()
 
     // 1. Try to fetch AI-generated content if available (placeholder for DB check)
+    // Note: We might want to pass pageType to AI generation in future
     const aiIntro = await generateAIContent({ niche: niche.name, city, state, type: 'intro' })
     const aiMetaTitle = await generateAIContent({ niche: niche.name, city, state, type: 'meta_title' })
     const aiMetaDesc = await generateAIContent({ niche: niche.name, city, state, type: 'meta_description' })
 
     const hashString = city + state + niche.slug
     const hash = getHash(hashString)
-    const selectedService = niche.services[hash % niche.services.length]
+
+    // Select service: either specific slug or random deterministic
+    let selectedService = niche.services[hash % niche.services.length];
+    if (serviceSlug) {
+        const foundService = niche.services.find(s => s.slug === serviceSlug);
+        if (foundService) selectedService = foundService;
+    }
 
     const placeholderVars = {
         city,
         state,
         stateCode: code,
         niche: niche.name,
-        service: selectedService.title
+        service: selectedService.title,
+        brand: siteConfig.siteName,
+        phone: siteConfig.contactPhone
+    }
+
+    // Select Templates based on pageType
+    let metaTitleTemplate = `{{service}} in {{city}}, {{state}} | {{brand}}`;
+    let metaDescTemplate = `Professional {{service}} in {{city}}, {{state}}. Licensed, insured local experts.`;
+    let h1Template = `{{service}} in {{city}}, {{state}}`; // Default to city
+
+    if (siteConfig.seoSettings) {
+        const s = siteConfig.seoSettings;
+        switch (pageType) {
+            case 'home':
+                metaTitleTemplate = s.meta_title_home || metaTitleTemplate;
+                metaDescTemplate = s.meta_description_home || metaDescTemplate;
+                h1Template = s.h1_template_home || `Find {{service}} Near Me`;
+                break;
+            case 'state':
+                metaTitleTemplate = s.meta_title_state || metaTitleTemplate;
+                metaDescTemplate = s.meta_description_state || metaDescTemplate;
+                h1Template = s.h1_template_state || `{{service}} in {{state}} | Local Experts`;
+                break;
+            case 'city':
+                metaTitleTemplate = s.meta_title_city || metaTitleTemplate;
+                metaDescTemplate = s.meta_description_city || metaDescTemplate;
+                h1Template = s.h1_template_city || `{{service}} in {{city}}, {{state}}`;
+                break;
+            case 'service':
+                metaTitleTemplate = s.meta_title_service || metaTitleTemplate;
+                metaDescTemplate = s.meta_description_service || metaDescTemplate;
+                h1Template = s.h1_template_service || `{{service}} Services in {{city}}`;
+                break;
+        }
     }
 
     return {
-        metaTitle: replacePlaceholders(aiMetaTitle || `${niche.primaryService} in ${city}, ${stateCode || state} | #1 Local ${niche.name}`, placeholderVars),
-        metaDescription: replacePlaceholders(aiMetaDesc || `Looking for ${niche.primaryService.toLowerCase()} in ${city}, ${stateCode || state}? Our professional crews provide top-quality ${niche.name.toLowerCase()} services near me. Free estimates!`, placeholderVars),
+        h1Title: replacePlaceholders(h1Template, placeholderVars),
+        metaTitle: replacePlaceholders(aiMetaTitle || metaTitleTemplate, placeholderVars),
+        metaDescription: replacePlaceholders(aiMetaDesc || metaDescTemplate, placeholderVars),
         metaKeywords: niche.keywords,
         intro: replacePlaceholders(aiIntro || `Searching for **${niche.primaryService.toLowerCase()} near me in ${city}**? You've found the #1 rated local ${niche.name.toLowerCase()} contractors in **${stateCode || state}**. We specialize in high-quality systems designed specifically for your area.`, placeholderVars),
         serviceDesc: replacePlaceholders(selectedService.description, placeholderVars),

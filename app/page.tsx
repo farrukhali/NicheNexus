@@ -3,20 +3,22 @@ import { supabase } from '@/lib/supabase'
 import Footer from '@/components/Footer'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { replacePlaceholders } from '@/lib/seo-utils'
 import { getSEOContent } from '@/lib/seo-content'
 import { Metadata } from 'next'
+import HomepageSchema from '@/components/seo/HomepageSchema'
 
 export const revalidate = 60 // Refresh content every minute
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSEOContent('United States', 'USA')
+  const seo = await getSEOContent({ city: 'United States', state: 'USA', pageType: 'home' })
   const siteConfig = await getSiteConfig()
 
   return {
     title: seo.metaTitle,
     description: seo.metaDescription,
     alternates: {
-      canonical: '/'
+      canonical: `https://${siteConfig.domain}`
     },
     openGraph: {
       title: seo.metaTitle,
@@ -30,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const siteConfig = await getSiteConfig()
   const niche = await getNicheConfig(siteConfig.nicheSlug)
-  const seo = await getSEOContent('United States', 'USA')
+  const seo = await getSEOContent({ city: 'United States', state: 'USA', pageType: 'home' })
 
   const { data, error } = await supabase
     .from('usa city name')
@@ -84,7 +86,9 @@ export default async function Home() {
               <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all">
                 <div className="text-3xl mb-4">{service.icon}</div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{service.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{service.description}</p>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  {replacePlaceholders(service.description, { city: 'your area', state: 'your state', stateCode: '', service: service.title, nicheName: niche.name })}
+                </p>
               </div>
             ))}
           </div>
@@ -147,16 +151,16 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">Frequently Asked Questions</h2>
           <p className="text-slate-600 text-center mb-10">Common questions from homeowners searching for local {niche.name.toLowerCase()} services.</p>
           <div className="space-y-4">
-            {niche.faqs.map((faq, i) => (
+            {(niche.home_faqs && niche.home_faqs.length > 0 ? niche.home_faqs : niche.faqs).map((faq, i) => (
               <details key={i} className="group bg-white p-6 rounded-2xl border border-slate-200 open:border-blue-200 open:ring-1 open:ring-blue-200 transition-all">
                 <summary className="flex justify-between items-center font-semibold cursor-pointer list-none text-slate-800">
-                  <span>{faq.question}</span>
+                  <span>{replacePlaceholders(faq.question, { service: niche.primaryService })}</span>
                   <span className="transition group-open:rotate-180">
                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                   </span>
                 </summary>
                 <p className="text-slate-600 mt-4 leading-relaxed group-open:animate-fadeIn">
-                  {faq.answer}
+                  {replacePlaceholders(faq.answer, { service: niche.primaryService })}
                 </p>
               </details>
             ))}

@@ -31,14 +31,19 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const stateCode = cityData?.state_id || state.toUpperCase()
     const stateName = cityData?.state_name || stateCode
 
-    const seo = await getSEOContent(formattedCity, stateName, stateCode)
+    const seo = await getSEOContent({
+        city: formattedCity,
+        state: stateName,
+        stateCode,
+        pageType: 'city'
+    })
 
     return {
         title: seo.metaTitle,
         description: seo.metaDescription,
         keywords: `${seo.metaKeywords}, ${formattedCity}, ${stateCode}`,
         alternates: {
-            canonical: `/${state.toLowerCase()}/${city.toLowerCase()}`
+            canonical: `https://${(await getSiteConfig()).domain}/${state.toLowerCase()}/${city.toLowerCase()}`
         },
         openGraph: {
             title: seo.metaTitle,

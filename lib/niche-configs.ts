@@ -2,6 +2,7 @@ export interface NicheConfig {
     name: string;
     slug: string;
     primaryService: string;
+    cityHeroImage?: string;
     keywords: string[];
     services: {
         title: string;
@@ -9,11 +10,25 @@ export interface NicheConfig {
         description: string;
         icon: string;
         heroImage?: string;
+        features?: string[];
+        benefits?: string[];
         process?: string[];
         materials?: { name: string; description: string }[];
         faqs?: { question: string; answer: string }[];
     }[];
     faqs: {
+        question: string;
+        answer: string;
+    }[];
+    home_faqs?: {
+        question: string;
+        answer: string;
+    }[];
+    state_faqs?: {
+        question: string;
+        answer: string;
+    }[];
+    city_faqs?: {
         question: string;
         answer: string;
     }[];
@@ -107,9 +122,13 @@ export const getNicheConfig = async (slug: string): Promise<NicheConfig> => {
                 name: data.name,
                 slug: data.slug,
                 primaryService: data.primary_service,
+                cityHeroImage: data.city_hero_image || '',
                 keywords: data.keywords || [],
                 services: data.services || [],
-                faqs: data.faqs || []
+                faqs: data.faqs || [],
+                home_faqs: data.home_faqs || [],
+                state_faqs: data.state_faqs || [],
+                city_faqs: data.city_faqs || []
             }
         } else {
             console.warn(`Niche "${slug}" not found in DB, checking static configs`);

@@ -109,6 +109,22 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                             </Link>
                         </div>
                     </div>
+
+                    {/* Hero Image - Right Side */}
+                    {niche.cityHeroImage && (
+                        <div className="hidden lg:block relative">
+                            <div className="relative w-full aspect-[4/3] max-w-lg mx-auto">
+                                <div className="absolute inset-0 bg-blue-500 rounded-3xl mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                                <div className="relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
+                                    <img
+                                        src={niche.cityHeroImage}
+                                        alt={`${niche.name} in ${formattedCity}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </header>
 
@@ -121,20 +137,103 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
             <AuthoritySignals stateCode={stateCode} city={formattedCity} />
             <RelatedServices city={formattedCity} state={stateCode} />
 
-            {/* Features Grid */}
-            <section className="py-24 px-6 bg-white relative z-20">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid md:grid-cols-3 gap-8 -mt-32">
-                        {niche.services.slice(0, 3).map((service, i) => (
-                            <div key={i} className="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 hover:border-blue-100 transition-all hover:-translate-y-1 group">
-                                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{service.icon}</div>
-                                <h3 className="text-xl font-bold mb-3 text-slate-800">{service.title}</h3>
-                                <p className="text-slate-600 leading-relaxed line-clamp-3">{service.description}</p>
+            {/* LOCAL EXPERTS "NEAR ME" SEO SECTION */}
+            <section className="py-20 px-6 bg-gradient-to-b from-slate-50 to-white">
+                <div className="max-w-6xl mx-auto">
+                    {/* Section Header */}
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                            Local Experts Serving {formattedCity} &amp; Surrounding Areas
+                        </h2>
+                        <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+                            When you search for <strong>{niche.primaryService.toLowerCase()} near me in {formattedCity}</strong>, you deserve contractors who truly understand your local area. Our {stateCode.toUpperCase()}-based crews have served thousands of homeowners across {formattedCity} and the surrounding communities.
+                        </p>
+                    </div>
+
+                    {/* Two Column Cards */}
+                    <div className="grid md:grid-cols-2 gap-8 mb-12">
+                        {/* Neighborhoods Card */}
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="text-3xl">🏘️</span>
+                                <h3 className="text-xl font-bold text-slate-900">Neighborhoods We Serve in {formattedCity}</h3>
                             </div>
-                        ))}
+                            <p className="text-slate-600 mb-4">
+                                Our <strong>{niche.name.toLowerCase()} near me in {formattedCity}</strong> specialists cover all residential zones including downtown, suburbs, and rural properties. We understand the drainage challenges and property coverage in your community.
+                            </p>
+                            <p className="text-slate-600">
+                                We also serve surrounding {stateCode.toUpperCase()} communities within a 30-mile radius. Looking for <strong>{niche.name.toLowerCase()} contractors near me</strong> outside city limits? Our crews regularly travel to nearby towns to provide the same quality service.
+                            </p>
+                        </div>
+
+                        {/* Climate-Specific Card */}
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="text-3xl">🌤️</span>
+                                <h3 className="text-xl font-bold text-slate-900">{stateCode.toUpperCase()} Climate-Ready Solutions</h3>
+                            </div>
+                            <p className="text-slate-600 mb-4">
+                                {stateCode.toUpperCase()} homeowners face unique weather challenges: {stateCode.toUpperCase()} weather requires {niche.name.toLowerCase()} solutions that can withstand local conditions. We use climate-appropriate materials and installation techniques. Local <strong>{niche.name.toLowerCase()} companies near me</strong> understand these unique challenges.
+                            </p>
+                            <p className="text-slate-600">
+                                That&apos;s why our <strong>{niche.primaryService.toLowerCase()} near me</strong> specialists design systems specifically engineered for local climate conditions. We recommend premium materials that handle {stateCode.toUpperCase()}&apos;s weather—get protected today.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Why Choose Us Section */}
+                    <div className="bg-blue-50 rounded-2xl p-8 mb-12">
+                        <h3 className="text-2xl font-bold text-slate-900 mb-6 text-center">
+                            Why {formattedCity} Homeowners Choose Us for <span className="text-blue-600">{niche.name}</span>
+                        </h3>
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="bg-white p-6 rounded-xl shadow-sm">
+                                <div className="text-2xl mb-3">🔧</div>
+                                <h4 className="font-bold text-slate-900 mb-2">Full-Service Solutions</h4>
+                                <p className="text-sm text-slate-600">
+                                    From <strong>{niche.services[0]?.title?.toLowerCase() || 'installation'}</strong> to <strong>{niche.services[1]?.title?.toLowerCase() || 'repairs'}</strong>, we handle everything. Complete {niche.name.toLowerCase()} solutions for your {formattedCity} property.
+                                </p>
+                            </div>
+                            <div className="bg-white p-6 rounded-xl shadow-sm">
+                                <div className="text-2xl mb-3">⭐</div>
+                                <h4 className="font-bold text-slate-900 mb-2">Trusted Local Reputation</h4>
+                                <p className="text-sm text-slate-600">
+                                    With thousands of completed projects across {stateCode.toUpperCase()}, we&apos;re the <strong>{niche.name.toLowerCase()} company near me</strong> that {formattedCity} residents recommend.
+                                </p>
+                            </div>
+                            <div className="bg-white p-6 rounded-xl shadow-sm">
+                                <div className="text-2xl mb-3">💰</div>
+                                <h4 className="font-bold text-slate-900 mb-2">Transparent Local Pricing</h4>
+                                <p className="text-sm text-slate-600">
+                                    When you search for <strong>{niche.primaryService.toLowerCase()} cost</strong>, you&apos;ll find our {formattedCity} pricing is competitive and straightforward—no hidden fees, no upsells.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CTA with Service Links */}
+                    <div className="text-center">
+                        <p className="text-lg text-slate-700 mb-6">
+                            Ready to get started with a <strong>{niche.primaryService.toLowerCase()} near me in {formattedCity}</strong>? Contact our local team today for a free, no-obligation estimate.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            {niche.services.slice(0, 4).map((service, i) => (
+                                <a
+                                    key={i}
+                                    href={`/${stateCode.toLowerCase()}/${city.toLowerCase()}/${service.slug}`}
+                                    className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${i === 0
+                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                        }`}
+                                >
+                                    {service.title} {i === 0 ? formattedCity : 'Near Me'}
+                                </a>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
+
 
             {/* Local Content Section */}
             <section className="py-20 px-6 bg-slate-50">
@@ -174,54 +273,117 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                 </div>
             </section>
 
-            <TopBusinesses city={formattedCity} state={stateCode} />
-
-            {/* Services Detailed Section */}
-            <section className="py-24 px-6 bg-slate-50">
-                <div className="max-w-7xl mx-auto">
+            {/* Trust & Credibility Section - NEW SEO SECTION */}
+            <section className="py-20 px-6 bg-gradient-to-b from-white to-blue-50">
+                <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
-                            Professional {niche.name} in {formattedCity}
+                        <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">Trusted by {formattedCity} Residents</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                            Your Local {niche.name} Partner in {formattedCity}, {stateCode.toUpperCase()}
                         </h2>
-                        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                            {content.serviceDesc}
+                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                            We&apos;re committed to providing {formattedCity} homeowners with exceptional {niche.name.toLowerCase()} services backed by experience, quality, and trust.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {niche.services.map((service, i) => (
-                            <div key={i} className="flex gap-6 p-8 rounded-2xl bg-white border border-slate-100 hover:shadow-xl transition-shadow group">
-                                <div className="w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                                    {service.icon}
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
-                                        {replacePlaceholders(service.title, placeholderVars)}
-                                    </h3>
-                                    <p className="text-slate-600 leading-relaxed">
-                                        {replacePlaceholders(service.description, { ...placeholderVars, service: service.title })}
-                                    </p>
+                    {/* Trust Stats Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+                        <div className="bg-white p-6 rounded-2xl shadow-lg text-center border border-slate-100 hover:border-blue-200 transition-all">
+                            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">15+</div>
+                            <p className="text-slate-600 font-medium">Years Serving {stateCode.toUpperCase()}</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-lg text-center border border-slate-100 hover:border-blue-200 transition-all">
+                            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">5,000+</div>
+                            <p className="text-slate-600 font-medium">Homes Served</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-lg text-center border border-slate-100 hover:border-blue-200 transition-all">
+                            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">4.9★</div>
+                            <p className="text-slate-600 font-medium">Customer Rating</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-lg text-center border border-slate-100 hover:border-blue-200 transition-all">
+                            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">100%</div>
+                            <p className="text-slate-600 font-medium">Satisfaction Guarantee</p>
+                        </div>
+                    </div>
+
+                    {/* Service Guarantees */}
+                    <div className="grid md:grid-cols-3 gap-8 mb-16">
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-2xl mb-4">✅</div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">Licensed & Insured</h3>
+                            <p className="text-slate-600">Fully licensed contractors with comprehensive insurance coverage protecting your {formattedCity} home and property.</p>
+                        </div>
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-2xl mb-4">🏆</div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">Quality Workmanship</h3>
+                            <p className="text-slate-600">We use only premium materials and proven techniques for every {niche.name.toLowerCase()} project in {formattedCity}.</p>
+                        </div>
+                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                            <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center text-2xl mb-4">⚡</div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">Fast Response Time</h3>
+                            <p className="text-slate-600">Same-day service available throughout {formattedCity} and surrounding {stateCode.toUpperCase()} communities.</p>
+                        </div>
+                    </div>
+
+                    {/* Our Commitment */}
+                    <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white">
+                        <div className="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 className="text-2xl md:text-3xl font-bold mb-4">Our Commitment to {formattedCity} Homeowners</h3>
+                                <p className="text-blue-200 mb-6">When you choose us for your {niche.name.toLowerCase()} needs, you&apos;re choosing a partner dedicated to your complete satisfaction.</p>
+                                <ul className="space-y-3">
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-green-400 mt-1">✓</span>
+                                        <span>Free, no-obligation estimates for {formattedCity} residents</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-green-400 mt-1">✓</span>
+                                        <span>Transparent pricing with no hidden fees</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-green-400 mt-1">✓</span>
+                                        <span>Written warranties on all workmanship</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-green-400 mt-1">✓</span>
+                                        <span>Clean job sites - we respect your property</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <span className="text-green-400 mt-1">✓</span>
+                                        <span>24/7 emergency services available in {stateCode.toUpperCase()}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="text-center">
+                                <div className="inline-block bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+                                    <div className="text-5xl mb-4">🛡️</div>
+                                    <p className="text-xl font-bold mb-2">Satisfaction Guaranteed</p>
+                                    <p className="text-blue-200 text-sm">If you&apos;re not 100% satisfied, we&apos;ll make it right.</p>
                                 </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
             </section>
+
 
             {/* FAQ Section */}
             <section className="py-24 px-6 bg-white">
                 <div className="max-w-4xl mx-auto">
                     <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Frequently Asked Questions</h2>
                     <div className="space-y-4">
-                        {niche.faqs.map((faq, i) => (
-                            <div key={i} className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                                <h3 className="text-lg font-bold text-slate-900 mb-2">
-                                    {replacePlaceholders(faq.question, placeholderVars)}
-                                </h3>
-                                <p className="text-slate-600">
+                        {(niche.city_faqs && niche.city_faqs.length > 0 ? niche.city_faqs : niche.faqs).map((faq, i) => (
+                            <details key={i} className="group bg-white p-6 rounded-2xl border border-slate-200 open:border-blue-200 open:ring-1 open:ring-blue-200 transition-all">
+                                <summary className="flex justify-between items-center font-semibold cursor-pointer list-none text-slate-800">
+                                    <span>{replacePlaceholders(faq.question, placeholderVars)}</span>
+                                    <span className="transition group-open:rotate-180">
+                                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </span>
+                                </summary>
+                                <p className="text-slate-600 mt-4 leading-relaxed group-open:animate-fadeIn">
                                     {replacePlaceholders(faq.answer, placeholderVars)}
                                 </p>
-                            </div>
+                            </details>
                         ))}
                     </div>
                 </div>

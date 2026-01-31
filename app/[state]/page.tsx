@@ -9,6 +9,8 @@ import { Metadata } from 'next'
 import RelatedServices from '@/components/RelatedServices'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { replacePlaceholders } from '@/lib/seo-utils'
+import { getSEOContent } from '@/lib/seo-content'
 
 export const revalidate = 60 // Refresh content every minute
 
@@ -37,7 +39,7 @@ export async function generateMetadata(props: StatePageProps): Promise<Metadata>
     const params = await props.params
     const stateCode = params.state.toUpperCase()
     const siteConfig = await getSiteConfig()
-    const niche = await getNicheConfig(siteConfig.nicheSlug)
+    // const niche = await getNicheConfig(siteConfig.nicheSlug) // Removed unused
 
     // Fetch state name optimization (limit 1)
     const { data: cityData } = await supabase
@@ -49,20 +51,46 @@ export async function generateMetadata(props: StatePageProps): Promise<Metadata>
 
     const stateName = cityData?.state_name || stateCode
 
+    const seo = await getSEOContent({
+        city: '',
+        state: stateName,
+        stateCode: stateCode,
+        pageType: 'state'
+    })
+
     return {
-        title: `${niche.name} Near Me in ${stateName} | Local Pros`,
-        description: `Find ${niche.name.toLowerCase()} experts in ${stateName}. Connect with licensed local contractors for ${niche.primaryService.toLowerCase()} and more. Free quotes!`,
-        keywords: `${niche.keywords}, ${stateName}`,
+        title: seo.metaTitle,
+        description: seo.metaDescription,
+        keywords: seo.metaKeywords?.join(', '),
         alternates: {
-            canonical: `/${stateCode.toLowerCase()}`
+            canonical: `https://${siteConfig.domain}/${params.state.toLowerCase()}`
         },
         openGraph: {
-            title: `Find ${niche.name} Near Me in ${stateName} | Local Experts`,
-            description: `Connect with top-rated ${niche.name.toLowerCase()} experts near you in ${stateName}. Get a free quote now.`,
-            url: `https://${siteConfig.domain}/${stateCode.toLowerCase()}`,
+            title: seo.metaTitle,
+            description: seo.metaDescription,
+            url: `https://${siteConfig.domain}/${params.state.toLowerCase()}`,
             type: 'website'
         }
     }
+}
+
+// Pre-generate all state pages at build time (SSG)
+export async function generateStaticParams() {
+    const { data } = await supabase
+        .from('usa city name')
+        .select('state_id')
+        .limit(100)
+
+    if (!data) return []
+
+    // Deduplicate states
+    const uniqueStates = Array.from(
+        new Set(data.map(item => item.state_id.toLowerCase()))
+    )
+
+    return uniqueStates.map(state => ({
+        state: state
+    }))
 }
 
 export default async function StatePage(props: StatePageProps) {
@@ -184,6 +212,26 @@ export default async function StatePage(props: StatePageProps) {
                             <h3 className="font-bold text-lg mb-2">Top Rated</h3>
                             <p className="text-slate-600 text-sm">Consistently rated 5-stars by homeowners across the state.</p>
                         </div>
+                    </div>
+                </section>
+
+                {/* FAQ Section */}
+                <section className="mt-20 max-w-4xl mx-auto">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">Common Questions in {stateName}</h2>
+                    <div className="space-y-4">
+                        {(niche.state_faqs && niche.state_faqs.length > 0 ? niche.state_faqs : niche.faqs).map((faq, i) => (
+                            <details key={i} className="group bg-white p-6 rounded-2xl border border-slate-200 open:border-blue-200 open:ring-1 open:ring-blue-200 transition-all">
+                                <summary className="flex justify-between items-center font-semibold cursor-pointer list-none text-slate-800">
+                                    <span>{replacePlaceholders(faq.question, { state: stateName, stateCode, service: niche.primaryService })}</span>
+                                    <span className="transition group-open:rotate-180">
+                                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </span>
+                                </summary>
+                                <p className="text-slate-600 mt-4 leading-relaxed group-open:animate-fadeIn">
+                                    {replacePlaceholders(faq.answer, { state: stateName, stateCode, service: niche.primaryService })}
+                                </p>
+                            </details>
+                        ))}
                     </div>
                 </section>
             </main>

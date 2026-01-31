@@ -79,6 +79,7 @@ export default async function Footer() {
                             <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
                             <li><Link href="/sitemap" className="hover:text-white transition-colors">Site Directory</Link></li>
                             <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -86,7 +87,7 @@ export default async function Footer() {
                     <p>&copy; {currentYear} {siteConfig.siteName}. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link href="/privacy" className="hover:text-slate-400">Privacy</Link>
-                        <Link href="/contact" className="hover:text-slate-400">Terms</Link>
+                        <Link href="/terms" className="hover:text-slate-400">Terms</Link>
                     </div>
                 </div>
             </div>
