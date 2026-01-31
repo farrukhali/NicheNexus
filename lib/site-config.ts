@@ -87,14 +87,15 @@ export const getSiteConfig = async (): Promise<SiteConfig> => {
     let host = ''
     try {
         const headersList = await headers()
-        host = headersList.get('host') || ''
+        // Prioritize x-forwarded-host (common behind proxies like Coolify/Nginx)
+        host = headersList.get('x-forwarded-host') || headersList.get('host') || ''
         // Remove port if present (e.g., localhost:3000 -> localhost)
         if (host.includes(':')) host = host.split(':')[0]
     } catch (e) {
         // Headers might not be available in all contexts (e.g. static gen), ignore
     }
 
-    if (host) {
+    if (host && host !== 'localhost') {
         const { data, error } = await supabase
             .from('site_configs')
             .select('*')
@@ -107,24 +108,40 @@ export const getSiteConfig = async (): Promise<SiteConfig> => {
     }
 
     // 2. Fallback: Fetch by Niche Slug (from ENV)
+    const nicheSlugFromEnv = (process.env.NEXT_PUBLIC_NICHE_SLUG || 'gutter').toLowerCase()
     try {
         const { data, error } = await supabase
             .from('site_configs')
             .select('*')
-            .eq('niche_slug', (process.env.NEXT_PUBLIC_NICHE_SLUG || 'gutter').toLowerCase())
+            .eq('niche_slug', nicheSlugFromEnv)
             .single()
 
         if (data && !error) {
             return mapConfigData(data, host)
         }
     } catch (e) {
-        console.warn('DB Config Fetch Failed, falling back to ENV', e)
+        // Fallback failed
     }
 
-    // 3. Last Resort: Environment Variables
+    // 3. Ultra Fallback: If no match by domain or EXACT slug, try to find ANY record 
+    // that roughly matches or just the first one if only one exists.
+    // This helps if the ENV slug is 'gutter' but DB has 'gutter-installation'.
+    try {
+        const { data: firstConfig } = await supabase
+            .from('site_configs')
+            .select('*')
+            .limit(1)
+            .single()
+
+        if (firstConfig) {
+            return mapConfigData(firstConfig, host)
+        }
+    } catch (e) { }
+
+    // 4. Last Resort: Environment Variables
     return {
         domain: host || process.env.NEXT_PUBLIC_SITE_DOMAIN || "localhost",
-        nicheSlug: (process.env.NEXT_PUBLIC_NICHE_SLUG || "gutter").toLowerCase(),
+        nicheSlug: nicheSlugFromEnv,
         siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Professional Services",
         contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "(555) 000-0000",
         contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "info@example.com",

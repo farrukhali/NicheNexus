@@ -11,6 +11,8 @@ export function replacePlaceholders(
         niche?: string;
         nicheName?: string;
         service?: string;
+        brand?: string;
+        phone?: string;
     }
 ): string {
     if (!text) return "";
@@ -25,6 +27,11 @@ export function replacePlaceholders(
         "{{niche}}": vars.niche,
         "{{nicheName}}": vars.nicheName || vars.niche,
         "{{service}}": vars.service,
+        "{{brand}}": vars.brand,
+        "{{phone}}": vars.phone,
+        "{{company}}": vars.brand,
+        "{{practice}}": vars.brand,
+        "{{clinic}}": vars.brand,
     };
 
     Object.entries(replacements).forEach(([placeholder, value]) => {
