@@ -173,7 +173,8 @@ export async function getSEOContent(
         niche: niche.name,
         service: selectedService.title,
         brand: siteConfig.siteName,
-        phone: siteConfig.contactPhone
+        phone: siteConfig.contactPhone,
+        baseurl: siteConfig.domain
     }
 
     // Select Templates based on pageType
@@ -234,7 +235,7 @@ export async function getSEOContent(
         h1Title: replacePlaceholders(h1Template, placeholderVars),
         metaTitle: replacePlaceholders(metaTitleTemplate, placeholderVars),
         metaDescription: replacePlaceholders(metaDescTemplate, placeholderVars),
-        metaKeywords: niche.keywords,
+        metaKeywords: niche.keywords.map(k => replacePlaceholders(k, placeholderVars)),
         intro: replacePlaceholders(`Searching for **${niche.primaryService.toLowerCase()} near me in ${city}**? You've found the #1 rated local ${niche.name.toLowerCase()} contractors in **${stateCode || state}**. We specialize in high-quality systems designed specifically for your area.`, placeholderVars),
         serviceDesc: replacePlaceholders(selectedService.description, placeholderVars),
         materials: replacePlaceholders(`We use only the highest quality materials for our ${niche.name.toLowerCase()} projects in ${city}.`, placeholderVars),

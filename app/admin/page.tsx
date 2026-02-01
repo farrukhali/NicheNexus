@@ -9,7 +9,7 @@ const DEFAULT_SITE_CONFIG = {
     site_name: '',
     domain: '',
     contact_phone: '',
-    contact_email: '',
+    contact_email: 'support@{{baseurl}}',
     niche_slug: '',
     gsc_id: '',
     ga4_id: '',
@@ -280,6 +280,7 @@ export default function AdminDashboard() {
             name: 'New Niche',
             slug: 'new-niche',
             primary_service: 'Service Name',
+            city_hero_image: 'https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png',
             keywords: [],
             services: [],
             faqs: []
@@ -1391,9 +1392,9 @@ export default function AdminDashboard() {
                                             <label className="block text-sm font-medium text-slate-700 mb-1">City Hero Image URL</label>
                                             <input
                                                 type="text"
-                                                placeholder="https://example.com/hero-image.jpg"
+                                                placeholder="https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png"
                                                 className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                                                value={selectedNiche.city_hero_image || ''}
+                                                value={selectedNiche.city_hero_image || 'https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png'}
                                                 onChange={(e) => setSelectedNiche({ ...selectedNiche, city_hero_image: e.target.value })}
                                             />
                                             <p className="text-xs text-slate-500 mt-1">This image will appear on all city pages (right side of hero section)</p>

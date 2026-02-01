@@ -41,9 +41,9 @@ export const NICHE_CONFIGS: Record<string, NicheConfig> = {
         primaryService: "Home Additions",
         keywords: ["home remodeling", "room additions", "second story addition", "kitchen remodel", "bathroom remodel"],
         services: [
-            { title: "Kitchen Remodeling", slug: "kitchen-remodeling", description: "Complete kitchen renovation services.", icon: "🍳" },
-            { title: "Bathroom Remodeling", slug: "bathroom-remodeling", description: "Modernize your bathroom with custom designs.", icon: "🚿" },
-            { title: "Room Additions", slug: "room-additions", description: "Expand your living space with professional additions.", icon: "🏠" }
+            { title: "Kitchen Remodeling", slug: "kitchen-remodeling", description: "Complete kitchen renovation services.", icon: "🍳", heroImage: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80" },
+            { title: "Bathroom Remodeling", slug: "bathroom-remodeling", description: "Modernize your bathroom with custom designs.", icon: "🚿", heroImage: "https://images.unsplash.com/photo-1584622050111-993a426fbf0a?auto=format&fit=crop&q=80" },
+            { title: "Room Additions", slug: "room-additions", description: "Expand your living space with professional additions.", icon: "🏠", heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80" }
         ],
         faqs: [
             { question: "How much does a home addition cost?", answer: "Costs vary by size and complexity; typically $150-$300 per square foot." },
@@ -57,8 +57,8 @@ export const NICHE_CONFIGS: Record<string, NicheConfig> = {
         primaryService: "Fence Installation",
         keywords: ["vinyl fence", "wood fence", "chain link fence", "privacy fence", "professional fence installation"],
         services: [
-            { title: "Vinyl Fence Installation", slug: "vinyl-fence", description: "Low-maintenance vinyl fencing solutions.", icon: "🏠" },
-            { title: "Wood Privacy Fences", slug: "wood-fence", description: "Classic wood fencing for privacy and security.", icon: "🪵" }
+            { title: "Vinyl Fence Installation", slug: "vinyl-fence", description: "Low-maintenance vinyl fencing solutions.", icon: "🏠", heroImage: "https://images.unsplash.com/photo-1596238699104-e34360e70477?auto=format&fit=crop&q=80" },
+            { title: "Wood Privacy Fences", slug: "wood-fence", description: "Classic wood fencing for privacy and security.", icon: "🪵", heroImage: "https://images.unsplash.com/photo-1509653087866-91f6c2ab5e47?auto=format&fit=crop&q=80" }
         ],
         faqs: [
             { question: "How long does a wood fence last?", answer: "A properly maintained wood fence can last 15-20 years." }
@@ -70,8 +70,8 @@ export const NICHE_CONFIGS: Record<string, NicheConfig> = {
         primaryService: "Roof Replacement",
         keywords: ["shingle roof", "metal roof", "roof repair", "local roofing contractors", "roof inspection"],
         services: [
-            { title: "Residential Roof Replacement", slug: "roof-replacement", description: "Complete roof overhaul with premium shingles.", icon: "🏠" },
-            { title: "Roof Repair & Maintenance", slug: "roof-repair", description: "Fast fixes for leaks and storm damage.", icon: "🔨" }
+            { title: "Residential Roof Replacement", slug: "roof-replacement", description: "Complete roof overhaul with premium shingles.", icon: "🏠", heroImage: "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&q=80" },
+            { title: "Roof Repair & Maintenance", slug: "roof-repair", description: "Fast fixes for leaks and storm damage.", icon: "🔨", heroImage: "https://images.unsplash.com/photo-1628135899946-4cb4da5c2901?auto=format&fit=crop&q=80" }
         ],
         faqs: [
             { question: "When should I replace my roof?", answer: "Most asphalt roofs should be replaced every 20-25 years." }
@@ -83,8 +83,8 @@ export const NICHE_CONFIGS: Record<string, NicheConfig> = {
         primaryService: "Gutter Installation",
         keywords: ["seamless gutters", "gutter repair", "gutter guards", "leaf protection"],
         services: [
-            { title: "Seamless Gutter Installation", slug: "seamless-installation", description: "Professional installation of custom-fit seamless gutters.", icon: "🔧" },
-            { title: "Gutter Repair & Cleaning", slug: "repair-cleaning", description: "Maintain your gutters with our repair and cleaning services.", icon: "🧹" }
+            { title: "Seamless Gutter Installation", slug: "seamless-installation", description: "Professional installation of custom-fit seamless gutters.", icon: "🔧", heroImage: "https://images.unsplash.com/photo-1610558694074-6729ce074872?auto=format&fit=crop&q=80" },
+            { title: "Gutter Repair & Cleaning", slug: "repair-cleaning", description: "Maintain your gutters with our repair and cleaning services.", icon: "🧹", heroImage: "https://images.unsplash.com/photo-1610558694074-6729ce074872?auto=format&fit=crop&q=80" }
         ],
         faqs: [
             { question: "How often should I clean my gutters?", answer: "We recommend cleaning at least twice a year, in spring and fall." }

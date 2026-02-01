@@ -61,7 +61,7 @@ export async function generateMetadata(props: StatePageProps): Promise<Metadata>
     return {
         title: seo.metaTitle,
         description: seo.metaDescription,
-        keywords: seo.metaKeywords?.join(', '),
+        keywords: `${(seo.metaKeywords || []).join(', ')}, ${stateName}, ${stateCode}`,
         alternates: {
             canonical: `https://${siteConfig.domain}/${params.state.toLowerCase()}`
         },

@@ -13,6 +13,7 @@ export function replacePlaceholders(
         service?: string;
         brand?: string;
         phone?: string;
+        baseurl?: string;
     }
 ): string {
     if (!text) return "";
@@ -33,6 +34,8 @@ export function replacePlaceholders(
         "{{company}}": vars.brand,
         "{{practice}}": vars.brand,
         "{{clinic}}": vars.brand,
+        "{{baseurl}}": vars.baseurl,
+        "{{domain}}": vars.baseurl,
     };
 
     Object.entries(replacements).forEach(([placeholder, value]) => {
@@ -40,8 +43,15 @@ export function replacePlaceholders(
             // Replace all occurrences
             const regex = new RegExp(placeholder, "gi");
             result = result.replace(regex, value);
+        } else {
+            // Remove placeholders that have no value (e.g., {{city}} on state pages)
+            const regex = new RegExp(placeholder, "gi");
+            result = result.replace(regex, "");
         }
     });
+
+    // Clean up any leftover formatting issues (double spaces, leading/trailing commas)
+    result = result.replace(/\s+/g, ' ').replace(/,\s*,/g, ',').replace(/^,\s*|\s*,$/g, '').trim();
 
     return result;
 }

@@ -1,4 +1,5 @@
 import { getSiteConfig } from '@/lib/site-config'
+import { replacePlaceholders } from '@/lib/seo-utils'
 import { getNicheConfig } from '@/lib/niche-configs'
 
 interface HomepageSchemaProps {
@@ -23,7 +24,7 @@ export default async function HomepageSchema(props?: HomepageSchemaProps) {
         "logo": siteConfig.logoUrl || `${baseUrl}/logo.png`,
         "image": siteConfig.logoUrl || `${baseUrl}/logo.png`,
         "telephone": siteConfig.contactPhone || "+1-555-123-4567",
-        "email": siteConfig.contactEmail || "contact@example.com",
+        "email": replacePlaceholders(siteConfig.contactEmail || "contact@example.com", { baseurl: siteConfig.domain }),
         "address": {
             "@type": "PostalAddress",
             "addressCountry": "US",

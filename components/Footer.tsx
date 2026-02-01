@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { replacePlaceholders } from '@/lib/seo-utils'
 import { Facebook, Instagram, Twitter, Linkedin, Phone, Mail, MapPin } from 'lucide-react'
 
 export default async function Footer() {
@@ -14,6 +15,11 @@ export default async function Footer() {
         { url: siteConfig.twitterUrl, icon: Twitter, label: 'Twitter' },
         { url: siteConfig.linkedinUrl, icon: Linkedin, label: 'LinkedIn' },
     ].filter(link => link.url)
+
+    // Process contact email to replace placeholders like {{baseurl}}
+    const processedEmail = replacePlaceholders(siteConfig.contactEmail, {
+        baseurl: siteConfig.domain
+    })
 
     return (
         <footer className="bg-slate-950 text-slate-400 py-16 border-t border-slate-900">
@@ -46,8 +52,8 @@ export default async function Footer() {
                                 </a>
                             </li>
                             <li>
-                                <a href={`mailto:${siteConfig.contactEmail}`} className="hover:text-blue-500 transition-colors flex items-center gap-3">
-                                    <Mail size={16} className="text-blue-500" /> {siteConfig.contactEmail}
+                                <a href={`mailto:${processedEmail}`} className="hover:text-blue-500 transition-colors flex items-center gap-3">
+                                    <Mail size={16} className="text-blue-500" /> {processedEmail}
                                 </a>
                             </li>
                             {siteConfig.businessAddress && (
