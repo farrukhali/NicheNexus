@@ -28,8 +28,19 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(baseUrl),
+    title: siteConfig.siteName,
+    description: siteConfig.footerTagline,
+    verification: {
+      google: siteConfig.gscId,
+    },
     alternates: {
       canonical: '/',
+    },
+    openGraph: {
+      images: siteConfig.seoSettings?.og_image_url ? [siteConfig.seoSettings.og_image_url] : [],
+    },
+    icons: {
+      icon: siteConfig.seoSettings?.favicon_url || '/favicon.ico',
     },
   }
 }

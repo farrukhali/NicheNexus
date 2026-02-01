@@ -20,9 +20,10 @@ interface ServiceSpecificPageProps {
         city: string
         state_id: string
     }[]
+    h1Title?: string
 }
 
-export default async function ServiceSpecificPage({ city, state, stateCode, service, relatedCities }: ServiceSpecificPageProps) {
+export default async function ServiceSpecificPage({ city, state, stateCode, service, relatedCities, h1Title }: ServiceSpecificPageProps) {
     const siteConfig = await getSiteConfig()
     const niche = await getNicheConfig(siteConfig.nicheSlug)
     const formattedCity = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -149,7 +150,7 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                             {service.title} in {stateCode.toUpperCase()}
                         </div>
                         <h1 className="text-4xl md:text-[3.5rem] font-extrabold text-white mb-6 leading-tight tracking-tight">
-                            {service.title} in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}, {stateCode.toUpperCase()}</span>
+                            {h1Title || `${service.title} in ${formattedCity}, ${stateCode.toUpperCase()}`}
                         </h1>
                         <p className="text-xl text-slate-300 mb-8 font-light">
                             {service.description(formattedCity, formattedState)}

@@ -13,6 +13,7 @@ const DEFAULT_SITE_CONFIG = {
     niche_slug: '',
     gsc_id: '',
     ga4_id: '',
+    gtm_container_id: '',
     clarity_id: '',
     open_router_key: '',
     // Business Address
@@ -35,9 +36,7 @@ const DEFAULT_SITE_CONFIG = {
     },
     // SEO Settings
     seo_settings: {
-        ga4_measurement_id: '',
         gtm_container_id: '',
-        search_console_verification: '',
         h1_template_home: 'Find {{service}} Near Me',
         h1_template_state: '{{service}} in {{state}} | Local Experts',
         h1_template_city: '{{service}} in {{city}}, {{state}} | Same-Day Service',
@@ -500,24 +499,6 @@ export default function AdminDashboard() {
                                             onChange={(e) => setSiteConfig({ ...siteConfig, contact_email: e.target.value })}
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">GSC ID</label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                                            value={siteConfig.gsc_id}
-                                            onChange={(e) => setSiteConfig({ ...siteConfig, gsc_id: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">GA4 ID</label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                                            value={siteConfig.ga4_id}
-                                            onChange={(e) => setSiteConfig({ ...siteConfig, ga4_id: e.target.value })}
-                                        />
-                                    </div>
                                     <div className="sm:col-span-2">
                                         <label className="block text-sm font-medium text-slate-700 mb-1">OpenRouter API Key (for AI Niche Generation)</label>
                                         <input
@@ -757,13 +738,10 @@ export default function AdminDashboard() {
                                             type="text"
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
                                             placeholder="G-XXXXXXXXXX"
-                                            value={siteConfig.seo_settings?.ga4_measurement_id || ''}
+                                            value={siteConfig.ga4_id || ''}
                                             onChange={(e) => setSiteConfig({
                                                 ...siteConfig,
-                                                seo_settings: {
-                                                    ...siteConfig.seo_settings,
-                                                    ga4_measurement_id: e.target.value
-                                                }
+                                                ga4_id: e.target.value
                                             })}
                                         />
                                     </div>
@@ -793,13 +771,25 @@ export default function AdminDashboard() {
                                             type="text"
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
                                             placeholder="google-site-verification=..."
-                                            value={siteConfig.seo_settings?.search_console_verification || ''}
+                                            value={siteConfig.gsc_id || ''}
                                             onChange={(e) => setSiteConfig({
                                                 ...siteConfig,
-                                                seo_settings: {
-                                                    ...siteConfig.seo_settings,
-                                                    search_console_verification: e.target.value
-                                                }
+                                                gsc_id: e.target.value
+                                            })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Microsoft Clarity ID
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="ID from Clarity Dashboard"
+                                            value={siteConfig.clarity_id || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                clarity_id: e.target.value
                                             })}
                                         />
                                     </div>
@@ -814,7 +804,7 @@ export default function AdminDashboard() {
                                     Use these placeholders to dynamically generate content across thousands of pages:
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                    {['{{city}}', '{{state}}', '{{state_code}}', '{{service}}', '{{brand}}', '{{phone}}'].map(tag => (
+                                    {['{{city}}', '{{state}}', '{{state_code}}', '{{niche}}', '{{nicheName}}', '{{service}}', '{{brand}}', '{{phone}}'].map(tag => (
                                         <code key={tag} className="bg-white px-3 py-1.5 rounded-lg border border-blue-200 text-xs font-mono text-blue-600 font-bold shadow-sm">
                                             {tag}
                                         </code>

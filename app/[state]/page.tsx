@@ -107,6 +107,12 @@ export default async function StatePage(props: StatePageProps) {
     const stateName = cities[0].state_name
     const siteConfig = await getSiteConfig()
     const niche = await getNicheConfig(siteConfig.nicheSlug)
+    const seo = await getSEOContent({
+        city: '',
+        state: stateName,
+        stateCode: stateCode,
+        pageType: 'state'
+    })
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500 selection:text-white flex flex-col">
@@ -138,7 +144,7 @@ export default async function StatePage(props: StatePageProps) {
                         Serving All of {stateName}
                     </div>
                     <h1 className="text-5xl md:text-[4rem] font-extrabold mb-6 tracking-tight">
-                        {niche.name} in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{stateName}</span>
+                        {seo.h1Title}
                     </h1>
                     <p className="text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
                         Find your local expert. We provide professional {niche.name.toLowerCase()} and related services across {cities.length} cities in {stateCode.toUpperCase()}.

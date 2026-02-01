@@ -24,6 +24,7 @@ export function replacePlaceholders(
         "{{city}}": vars.city,
         "{{state}}": vars.state,
         "{{stateCode}}": vars.stateCode,
+        "{{state_code}}": vars.stateCode,
         "{{niche}}": vars.niche,
         "{{nicheName}}": vars.nicheName || vars.niche,
         "{{service}}": vars.service,

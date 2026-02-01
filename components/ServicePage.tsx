@@ -96,7 +96,7 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                             #1 Rated in {stateCode.toUpperCase()}
                         </div>
                         <h1 className="text-4xl md:text-[3.5rem] font-extrabold text-white mb-8 leading-tight tracking-tight">
-                            {niche.primaryService} in <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{formattedCity}, {stateCode.toUpperCase()} Near Me</span>
+                            {content.h1Title}
                         </h1>
                         <div className="text-lg md:text-xl text-slate-300 mb-10 font-light space-y-4">
                             <p dangerouslySetInnerHTML={{ __html: content.intro.replace(/\*\*(.*?)\*\*/g, '<span class="text-white font-medium">$1</span>') }} />
@@ -222,8 +222,8 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                                     key={i}
                                     href={`/${stateCode.toLowerCase()}/${city.toLowerCase()}/${service.slug}`}
                                     className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${i === 0
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                                         }`}
                                 >
                                     {service.title} {i === 0 ? formattedCity : 'Near Me'}

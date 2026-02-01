@@ -62,7 +62,7 @@ export default async function Home() {
             Find {niche.name} Services Near You
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold mb-8 text-white tracking-tight leading-tight">
-            Find <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{niche.primaryService}</span><br />Near Me
+            {seo.h1Title}
           </h1>
           <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto font-light mb-12 leading-relaxed">
             Searching for <span className="text-white font-semibold">{niche.primaryService.toLowerCase()} contractors near me</span>? Connect with local experts in over <span className="text-white font-semibold">31,000+ cities</span>.

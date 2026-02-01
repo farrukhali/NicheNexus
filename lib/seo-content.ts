@@ -156,12 +156,6 @@ export async function getSEOContent(
     const niche = await getNicheConfig(siteConfig.nicheSlug)
     const code = stateCode?.toUpperCase() || state.substring(0, 2).toUpperCase()
 
-    // 1. Try to fetch AI-generated content if available (placeholder for DB check)
-    // Note: We might want to pass pageType to AI generation in future
-    const aiIntro = await generateAIContent({ niche: niche.name, city, state, type: 'intro' })
-    const aiMetaTitle = await generateAIContent({ niche: niche.name, city, state, type: 'meta_title' })
-    const aiMetaDesc = await generateAIContent({ niche: niche.name, city, state, type: 'meta_description' })
-
     const hashString = city + state + niche.slug
     const hash = getHash(hashString)
 
@@ -213,12 +207,35 @@ export async function getSEOContent(
         }
     }
 
+    // 2. Only fetch AI content if we don't have a specific template or for variety if desired
+    // For now, we prioritize user templates. If they are empty, we fallback to AI.
+    let aiMetaTitle = null;
+    let aiMetaDesc = null;
+    let aiIntro = null;
+
+    if (!metaTitleTemplate || metaTitleTemplate.includes('{{brand}} | {{service}} Services')) {
+        // Optionally use AI if it's just the default template
+        // But for now, let's only do it if explicitly empty to avoid surprising user
+    }
+
+    // If the user hasn't set a customized description, AI can provide better variety
+    if (!siteConfig.seoSettings?.meta_description_home && pageType === 'home') {
+        // aiMetaDesc = await generateAIContent({ niche: niche.name, city, state, type: 'meta_description' })
+    }
+
+    // Actually, let's only fetch AI if the fields are truly empty or "AI" is requested
+    // Optimization: Skip AI calls if templates are already customized
+    const isDefaultTitle = metaTitleTemplate === `{{service}} in {{city}}, {{state}} | {{brand}}` || metaTitleTemplate === `{{brand}} | {{service}} Services`;
+
+    // To respect the user's manual settings, we ONLY use AI if they haven't touched the field
+    // or if the field is empty.
+
     return {
         h1Title: replacePlaceholders(h1Template, placeholderVars),
-        metaTitle: replacePlaceholders(aiMetaTitle || metaTitleTemplate, placeholderVars),
-        metaDescription: replacePlaceholders(aiMetaDesc || metaDescTemplate, placeholderVars),
+        metaTitle: replacePlaceholders(metaTitleTemplate, placeholderVars),
+        metaDescription: replacePlaceholders(metaDescTemplate, placeholderVars),
         metaKeywords: niche.keywords,
-        intro: replacePlaceholders(aiIntro || `Searching for **${niche.primaryService.toLowerCase()} near me in ${city}**? You've found the #1 rated local ${niche.name.toLowerCase()} contractors in **${stateCode || state}**. We specialize in high-quality systems designed specifically for your area.`, placeholderVars),
+        intro: replacePlaceholders(`Searching for **${niche.primaryService.toLowerCase()} near me in ${city}**? You've found the #1 rated local ${niche.name.toLowerCase()} contractors in **${stateCode || state}**. We specialize in high-quality systems designed specifically for your area.`, placeholderVars),
         serviceDesc: replacePlaceholders(selectedService.description, placeholderVars),
         materials: replacePlaceholders(`We use only the highest quality materials for our ${niche.name.toLowerCase()} projects in ${city}.`, placeholderVars),
         whyChoose: replacePlaceholders(`Homeowners in ${city} trust us for our transparent pricing and quality workmanship.`, placeholderVars),

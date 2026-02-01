@@ -3,9 +3,7 @@ import { headers } from 'next/headers'
 
 // SEO Settings Interface
 export interface SEOSettings {
-    ga4_measurement_id?: string
     gtm_container_id?: string
-    search_console_verification?: string
     h1_template_home?: string
     h1_template_state?: string
     h1_template_city?: string

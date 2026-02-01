@@ -62,6 +62,14 @@ export default async function Page(props: StartServicePageProps) {
     const stateName = cityData?.state_name || state
     const stateCodeProper = cityData?.state_id || state
 
+    // Fetch SEO content for the page
+    const seo = await getSEOContent({
+        city: cityName,
+        state: stateName,
+        pageType: 'service',
+        serviceSlug: service
+    })
+
     // Fetch related cities
     const relatedCities = await getRelatedCities(stateCodeProper, cityName)
 
@@ -80,5 +88,6 @@ export default async function Page(props: StartServicePageProps) {
             faqs: (serviceInfo as any).faqs || []
         }}
         relatedCities={relatedCities}
+        h1Title={seo.h1Title}
     />
 }
