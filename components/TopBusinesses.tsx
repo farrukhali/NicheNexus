@@ -51,7 +51,7 @@ export default async function TopBusinesses({ city, state }: TopBusinessesProps)
         "Get Pricing"
     ]
 
-    const mainPhoneNumber = "+18588985338"
+    const mainPhoneNumber = siteConfig.contactPhone?.replace(/\D/g, '') || "15551234567"
 
     // Generate ItemList schema for SEO
     const itemListSchema = {
