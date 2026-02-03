@@ -89,5 +89,7 @@ export default async function Page(props: StartServicePageProps) {
         }}
         relatedCities={relatedCities}
         h1Title={seo.h1Title}
+        latitude={cityData?.lat}
+        longitude={cityData?.lng}
     />
 }

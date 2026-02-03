@@ -14,7 +14,11 @@ import TopBusinesses from '@/components/TopBusinesses'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
 import JsonLdSchema from '@/components/seo/JsonLdSchema'
+import LocalBusinessSchema from '@/components/seo/LocalBusinessSchema'
 import { replacePlaceholders } from '@/lib/seo-utils'
+import { getWeatherData } from '@/lib/weather'
+import WeatherWidget from '@/components/WeatherWidget'
+import LocalReviews from '@/components/LocalReviews'
 
 interface ServicePageProps {
     city: string
@@ -40,6 +44,9 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
     // Generate Dynamic SEO Content
     const content = await getSEOContent(formattedCity, formattedState, stateCode)
 
+    // Fetch local weather data
+    const weather = (latitude && longitude) ? await getWeatherData(latitude, longitude) : null
+
     const placeholderVars = {
         city: formattedCity,
         state: formattedState,
@@ -53,19 +60,16 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500 selection:text-white">
-            <JsonLdSchema type="LocalBusiness" data={{
-                name: `${siteConfig.siteName} - ${formattedCity}`,
-                description: `Professional ${niche.name.toLowerCase()} in ${formattedCity}, ${stateCode}. Same-day quotes, licensed & insured.`,
-                url: `https://${siteConfig.domain}/${stateCode.toLowerCase()}/${city.toLowerCase()}`,
-                telephone: siteConfig.contactPhone,
-                address: {
-                    "@type": "PostalAddress",
-                    "addressLocality": formattedCity,
-                    "addressRegion": stateCode.toUpperCase(),
-                    "addressCountry": "US",
-                    "postalCode": zipCodes?.[0] || ""
-                }
-            }} />
+            <LocalBusinessSchema
+                city={formattedCity}
+                state={formattedState}
+                stateCode={stateCode}
+                zipCodes={zipCodes}
+                latitude={latitude}
+                longitude={longitude}
+                serviceName={niche.primaryService}
+                siteConfig={siteConfig}
+            />
 
             {/* Navigation */}
             <nav className="fixed w-full z-50 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-sm">
@@ -122,6 +126,11 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                                         className="w-full h-full object-contain bg-slate-900"
                                     />
                                 </div>
+                                {weather && (
+                                    <div className="mt-6">
+                                        <WeatherWidget city={formattedCity} weather={weather} />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -366,6 +375,14 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                 </div>
             </section>
 
+
+            <LocalReviews
+                city={formattedCity}
+                state={formattedState}
+                serviceName={niche.primaryService}
+                siteConfig={siteConfig}
+                latitude={latitude}
+            />
 
             {/* FAQ Section */}
             <section className="py-24 px-6 bg-white">

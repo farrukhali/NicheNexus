@@ -38,8 +38,8 @@ export default async function HomepageSchema(props?: HomepageSchemaProps) {
         "serviceType": niche.primaryService,
         "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "1247",
+            "ratingValue": (siteConfig.trustSignals?.average_rating || 4.8).toString(),
+            "reviewCount": (siteConfig.trustSignals?.total_reviews || 1247).toString(),
             "bestRating": "5",
             "worstRating": "1"
         }

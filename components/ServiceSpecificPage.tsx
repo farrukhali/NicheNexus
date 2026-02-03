@@ -10,6 +10,10 @@ import CityMap from '@/components/CityMap'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
 import { replacePlaceholders, replacePlaceholdersInArray, replacePlaceholdersInMaterials } from '@/lib/seo-utils'
+import { getWeatherData } from '@/lib/weather'
+import WeatherWidget from '@/components/WeatherWidget'
+import LocalBusinessSchema from '@/components/seo/LocalBusinessSchema'
+import LocalReviews from '@/components/LocalReviews'
 
 interface ServiceSpecificPageProps {
     city: string
@@ -21,9 +25,11 @@ interface ServiceSpecificPageProps {
         state_id: string
     }[]
     h1Title?: string
+    latitude?: number
+    longitude?: number
 }
 
-export default async function ServiceSpecificPage({ city, state, stateCode, service, relatedCities, h1Title }: ServiceSpecificPageProps) {
+export default async function ServiceSpecificPage({ city, state, stateCode, service, relatedCities, h1Title, latitude, longitude }: ServiceSpecificPageProps) {
     const siteConfig = await getSiteConfig()
     const niche = await getNicheConfig(siteConfig.nicheSlug)
     const formattedCity = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -36,6 +42,9 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
         niche: niche.name,
         service: service.title
     }
+
+    // Fetch local weather
+    const weather = (latitude && longitude) ? await getWeatherData(latitude, longitude) : null
 
     // Get dynamic content from the service prop (fetched from DB)
     const extendedContent = {
@@ -117,6 +126,15 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-500 selection:text-white">
 
             {/* Schema Markup */}
+            <LocalBusinessSchema
+                city={formattedCity}
+                state={formattedState}
+                stateCode={stateCode}
+                latitude={latitude}
+                longitude={longitude}
+                serviceName={service.title}
+                siteConfig={siteConfig}
+            />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
@@ -174,18 +192,23 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                         </div>
                     </div>
 
-                    {/* Hero Image - Right Side */}
-                    {niche.cityHeroImage && (
+                    {/* Hero Right Side - Image & Weather */}
+                    {(niche.cityHeroImage || weather) && (
                         <div className="relative hidden lg:block">
-                            <div className="relative w-full aspect-[4/3] max-w-lg mx-auto">
-                                <div className="absolute inset-0 bg-blue-500 rounded-3xl mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-                                <div className="relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                                    <img
-                                        src={niche.cityHeroImage}
-                                        alt={`${service.title} in ${formattedCity}`}
-                                        className="w-full h-full object-contain bg-slate-900"
-                                    />
-                                </div>
+                            <div className="relative w-full max-w-lg mx-auto">
+                                {niche.cityHeroImage && (
+                                    <div className="relative aspect-[4/3] z-10 w-full rounded-2xl overflow-hidden shadow-2xl mb-6">
+                                        <div className="absolute inset-0 bg-blue-500 mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                                        <img
+                                            src={niche.cityHeroImage}
+                                            alt={`${service.title} in ${formattedCity}`}
+                                            className="w-full h-full object-contain bg-slate-900"
+                                        />
+                                    </div>
+                                )}
+                                {weather && (
+                                    <WeatherWidget city={formattedCity} weather={weather} />
+                                )}
                             </div>
                         </div>
                     )}
@@ -321,6 +344,14 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                     </div>
                 </div>
             </section>
+
+            <LocalReviews
+                city={formattedCity}
+                state={formattedState}
+                serviceName={service.title}
+                siteConfig={siteConfig}
+                latitude={latitude}
+            />
 
             {/* FAQ Section */}
             <section className="py-16 px-6 bg-white">

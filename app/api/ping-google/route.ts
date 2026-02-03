@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
+import { getSiteConfig } from '@/lib/site-config'
 
 // API endpoint to ping Google about sitemap updates
 // Usage: POST /api/ping-google
 // This should be called after deploying new content
 
 export async function POST() {
-    const sitemapUrl = 'https://usgutterinstallation.com/sitemap.xml'
+    const siteConfig = await getSiteConfig()
+    const sitemapUrl = `https://${siteConfig.domain}/sitemap.xml`
 
     try {
         // Ping Google

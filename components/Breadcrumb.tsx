@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { getSiteConfig } from '@/lib/site-config'
+
 interface BreadcrumbItem {
     label: string
     href: string
@@ -9,7 +11,12 @@ interface BreadcrumbProps {
     items: BreadcrumbItem[]
 }
 
-export default function Breadcrumb({ items }: BreadcrumbProps) {
+export default async function Breadcrumb({ items }: BreadcrumbProps) {
+    const siteConfig = await getSiteConfig()
+    const domain = siteConfig.domain
+    const protocol = domain.includes('localhost') ? 'http' : 'https'
+    const baseUrl = `${protocol}://${domain}`
+
     const schemaItems = [
         { label: 'Home', href: '/' },
         ...items.map(item => ({ label: item.label, href: item.href }))
@@ -22,7 +29,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
             "@type": "ListItem",
             "position": index + 1,
             "name": item.label,
-            "item": `https://usgutterinstallation.com${item.href}` // Replace with actual domain in production
+            "item": item.href === '/' ? baseUrl : `${baseUrl}${item.href.startsWith('/') ? '' : '/'}${item.href}`
         }))
     }
 
