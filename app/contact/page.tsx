@@ -4,6 +4,7 @@ import { NavbarCallBtn, CallBtn } from '@/components/CallBtn'
 import TrustBadges from '@/components/TrustBadges'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { replacePlaceholders } from '@/lib/seo-utils'
 
 export async function generateMetadata() {
     const siteConfig = await getSiteConfig()
@@ -38,7 +39,7 @@ export default async function ContactPage() {
             "@type": "Organization",
             "name": siteConfig.siteName,
             "telephone": siteConfig.contactPhone,
-            "email": siteConfig.contactEmail,
+            "email": replacePlaceholders(siteConfig.contactEmail, { baseurl: siteConfig.domain }),
             "address": siteConfig.businessAddress ? {
                 "@type": "PostalAddress",
                 "streetAddress": siteConfig.businessAddress,
@@ -91,7 +92,7 @@ export default async function ContactPage() {
                             <div>
                                 <h3 className="text-xl font-bold mb-2">Email Support</h3>
                                 <p className="text-slate-600 mb-1">For non-urgent inquiries:</p>
-                                <a href={`mailto:${siteConfig.contactEmail}`} className="text-blue-600 font-semibold hover:underline">{siteConfig.contactEmail}</a>
+                                <a href={`mailto:${replacePlaceholders(siteConfig.contactEmail, { baseurl: siteConfig.domain })}`} className="text-blue-600 font-semibold hover:underline">{replacePlaceholders(siteConfig.contactEmail, { baseurl: siteConfig.domain })}</a>
                             </div>
 
                             <div>

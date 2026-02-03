@@ -4,6 +4,7 @@ import { NavbarCallBtn } from '@/components/CallBtn'
 import TrustBadges from '@/components/TrustBadges'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { replacePlaceholders } from '@/lib/seo-utils'
 
 export async function generateMetadata() {
     const siteConfig = await getSiteConfig()
@@ -40,7 +41,7 @@ export default async function AboutPage() {
             "addressRegion": "Nationwide"
         },
         "telephone": siteConfig.contactPhone,
-        "email": siteConfig.contactEmail,
+        "email": replacePlaceholders(siteConfig.contactEmail, { baseurl: siteConfig.domain }),
         "areaServed": {
             "@type": "Country",
             "name": "United States"
@@ -155,7 +156,7 @@ export default async function AboutPage() {
                             <address className="not-italic text-slate-700">
                                 <strong>{siteConfig.siteName}</strong><br />
                                 <strong>Phone:</strong> <a href={`tel:${siteConfig.contactPhone}`} className="text-blue-600 hover:underline">{siteConfig.contactPhone}</a><br />
-                                <strong>Email:</strong> <a href={`mailto:${siteConfig.contactEmail}`} className="text-blue-600 hover:underline">{siteConfig.contactEmail}</a>
+                                <strong>Email:</strong> <a href={`mailto:${replacePlaceholders(siteConfig.contactEmail, { baseurl: siteConfig.domain })}`} className="text-blue-600 hover:underline">{replacePlaceholders(siteConfig.contactEmail, { baseurl: siteConfig.domain })}</a>
                             </address>
                         </section>
                     </div>
