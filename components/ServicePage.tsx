@@ -19,6 +19,8 @@ import { replacePlaceholders } from '@/lib/seo-utils'
 import { getWeatherData } from '@/lib/weather'
 import WeatherWidget from '@/components/WeatherWidget'
 import LocalReviews from '@/components/LocalReviews'
+import RecentActivity from '@/components/RecentActivity'
+import SeasonalTip from '@/components/SeasonalTip'
 
 interface ServicePageProps {
     city: string
@@ -261,22 +263,30 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                             <p className="text-sm text-slate-600" dangerouslySetInnerHTML={{ __html: content.technicalSpecs.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                         </div>
 
-                        <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 mb-6">
-                            <p className="text-sm text-amber-800 font-semibold mb-1">🌤️ {stateCode.toUpperCase()} Weather Alert</p>
-                            <p className="text-sm text-amber-700">{content.climateConsiderations}</p>
-                        </div>
-
-                        <CityMap city={formattedCity} state={stateCode} />
+                        <p className="text-sm text-amber-700">{content.climateConsiderations}</p>
                     </div>
 
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-3xl transform rotate-3 opacity-20"></div>
-                        <div className="relative bg-white p-2 rounded-3xl shadow-2xl overflow-hidden aspect-[4/3] flex items-center justify-center text-slate-900">
-                            <div className="text-center">
-                                <div className="text-6xl mb-4">🏠</div>
-                                <h3 className="text-2xl font-bold">{niche.name} Experts</h3>
-                                <p className="text-blue-600">Serving {formattedCity}</p>
-                            </div>
+                    {/* Dynamic Activity Feed */}
+                    <div className="grid gap-6 mb-8">
+                        <RecentActivity
+                            city={formattedCity}
+                            stateCode={stateCode}
+                            serviceName={niche.primaryService}
+                            zipCodes={zipCodes}
+                        />
+                        <SeasonalTip />
+                    </div>
+
+                    <CityMap city={formattedCity} state={stateCode} />
+                </div>
+
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-3xl transform rotate-3 opacity-20"></div>
+                    <div className="relative bg-white p-2 rounded-3xl shadow-2xl overflow-hidden aspect-[4/3] flex items-center justify-center text-slate-900">
+                        <div className="text-center">
+                            <div className="text-6xl mb-4">🏠</div>
+                            <h3 className="text-2xl font-bold">{niche.name} Experts</h3>
+                            <p className="text-blue-600">Serving {formattedCity}</p>
                         </div>
                     </div>
                 </div>
@@ -373,7 +383,7 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
 
             <LocalReviews
@@ -418,6 +428,6 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
             <InternalLinks currentCity={formattedCity} stateCode={stateCode} relatedCities={relatedCities} />
             <TrustBadges />
             <Footer city={formattedCity} stateCode={stateCode} />
-        </div>
+        </div >
     )
 }
