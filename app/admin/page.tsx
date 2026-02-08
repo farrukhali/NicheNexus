@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { LayoutDashboard, Settings, Globe, Phone, Mail, Plus, Save, Trash2, ShieldCheck, LogOut, Wand2, Loader2, Bot } from 'lucide-react'
 import { generateNicheWithAI, DEFAULT_PROMPT } from '@/lib/ai-niche-generator'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 const DEFAULT_SITE_CONFIG = {
     site_name: '',
@@ -82,6 +83,10 @@ const DEFAULT_SITE_CONFIG = {
 }
 
 export default function AdminDashboard() {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
+
     const [activeTab, setActiveTab] = useState('site')
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [password, setPassword] = useState('')
@@ -94,6 +99,51 @@ export default function AdminDashboard() {
     // Niche Config State
     const [niches, setNiches] = useState<any[]>([])
     const [selectedNiche, setSelectedNiche] = useState<any>(null)
+
+    useEffect(() => {
+        const tab = searchParams.get('tab')
+        if (tab) setActiveTab(tab)
+
+        const nicheSlug = searchParams.get('niche')
+
+        // If niches are loaded but no niche is selected (or mismatch), sync from URL
+        if (niches.length > 0) {
+            const targetNiche = nicheSlug
+                ? niches.find(n => n.slug === nicheSlug)
+                : niches[0]
+
+            // Only update if changed to prevent infinite loops/redundant fetches
+            if (targetNiche && (!selectedNiche || selectedNiche.slug !== targetNiche.slug)) {
+                setSelectedNiche(targetNiche)
+                fetchSiteConfigForNiche(targetNiche.slug)
+                // If it was a default selection (no param), maybe sync URL? 
+                // Optional, but good for consistency.
+                if (!nicheSlug) {
+                    const current = new URLSearchParams(Array.from(searchParams.entries()))
+                    current.set('niche', targetNiche.slug)
+                    router.replace(`${pathname}?${current.toString()}`)
+                }
+            }
+        }
+    }, [searchParams, niches])
+
+    const updateUrl = (key: string, value: string) => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()))
+        if (value) current.set(key, value)
+        else current.delete(key)
+        const search = current.toString()
+        const query = search ? `?${search}` : ''
+        router.push(`${pathname}${query}`)
+    }
+
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab)
+        updateUrl('tab', tab)
+    }
+
+    const handleNicheSelect = (niche: any) => {
+        updateUrl('niche', niche.slug)
+    }
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -129,13 +179,8 @@ export default function AdminDashboard() {
     async function fetchData() {
         setLoading(true)
         const { data: nichesData } = await supabase.from('niche_configs').select('*')
-        if (nichesData) {
+        if (nichesData && nichesData.length > 0) {
             setNiches(nichesData)
-            if (nichesData.length > 0) {
-                setSelectedNiche(nichesData[0])
-                // Load config for the first niche by default
-                await fetchSiteConfigForNiche(nichesData[0].slug)
-            }
         } else {
             // Fallback if no niches
             const { data: sites } = await supabase.from('site_configs').select('*').limit(1).single()
@@ -239,6 +284,7 @@ export default function AdminDashboard() {
                 if (error) throw error
 
                 setSelectedNiche(finalNiche)
+                updateUrl('niche', finalNiche.slug)
                 // Refresh list
                 const { data } = await supabase.from('niche_configs').select('*')
                 if (data) setNiches(data)
@@ -275,6 +321,7 @@ export default function AdminDashboard() {
             setMessage({ type: 'error', text: error.message })
         } else {
             setMessage({ type: 'success', text: 'Niche configuration saved!' })
+            updateUrl('niche', normalizedSlug)
             fetchData()
         }
         setLoading(false)
@@ -297,7 +344,7 @@ export default function AdminDashboard() {
             faqs: []
         }
         setNiches([...niches, newNiche])
-        setSelectedNiche(newNiche)
+        handleNicheSelect(newNiche)
     }
 
     const handleAddFAQ = () => {
@@ -427,37 +474,37 @@ export default function AdminDashboard() {
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
                     <button
-                        onClick={() => setActiveTab('site')}
+                        onClick={() => handleTabChange('site')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'site' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                     >
                         <Settings size={20} /> Site Settings
                     </button>
                     <button
-                        onClick={() => setActiveTab('ai')}
+                        onClick={() => handleTabChange('ai')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'ai' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                     >
                         <Bot size={20} /> AI Config
                     </button>
                     <button
-                        onClick={() => setActiveTab('niches')}
+                        onClick={() => handleTabChange('niches')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'niches' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                     >
                         <Globe size={20} /> Niche Manager
                     </button>
                     <button
-                        onClick={() => setActiveTab('seo')}
+                        onClick={() => handleTabChange('seo')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'seo' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                     >
                         <Settings size={20} /> SEO Settings
                     </button>
                     <button
-                        onClick={() => setActiveTab('expert')}
+                        onClick={() => handleTabChange('expert')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'expert' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                     >
                         <ShieldCheck size={20} /> Expert Info
                     </button>
                     <button
-                        onClick={() => setActiveTab('trust')}
+                        onClick={() => handleTabChange('trust')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'trust' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
                     >
                         <Wand2 size={20} /> Trust Signals
@@ -816,6 +863,17 @@ export default function AdminDashboard() {
 
                 {activeTab === 'seo' && (
                     <div className="space-y-8">
+                        <div className="flex gap-4 overflow-x-auto pb-4">
+                            {niches.map(n => (
+                                <button
+                                    key={n.slug}
+                                    onClick={() => handleNicheSelect(n)}
+                                    className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${selectedNiche?.slug === n.slug ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'}`}
+                                >
+                                    {n.name}
+                                </button>
+                            ))}
+                        </div>
                         <div className="grid lg:grid-cols-2 gap-8">
                             {/* Analytics Section */}
                             <section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
@@ -1415,7 +1473,7 @@ export default function AdminDashboard() {
                             {niches.map(n => (
                                 <button
                                     key={n.slug}
-                                    onClick={() => setSelectedNiche(n)}
+                                    onClick={() => handleNicheSelect(n)}
                                     className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${selectedNiche?.slug === n.slug ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'}`}
                                 >
                                     {n.name}
