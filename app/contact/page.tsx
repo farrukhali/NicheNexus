@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
 import { NavbarCallBtn, CallBtn } from '@/components/CallBtn'
-import TrustBadges from '@/components/TrustBadges'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
 import { replacePlaceholders } from '@/lib/seo-utils'
@@ -112,7 +111,6 @@ export default async function ContactPage() {
                 </div>
             </main>
 
-            <TrustBadges />
             <Footer />
         </div>
     )

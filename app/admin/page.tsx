@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { LayoutDashboard, Settings, Globe, Phone, Mail, Plus, Save, Trash2, ShieldCheck, LogOut, Wand2, Loader2, Bot, X } from 'lucide-react'
 import { generateNicheWithAI, DEFAULT_PROMPT } from '@/lib/ai-niche-generator'
+import { generateAIContent } from '@/lib/ai-content'
 import RichTextEditor from '@/components/admin/RichTextEditor'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { CldUploadWidget } from 'next-cloudinary'
@@ -60,7 +61,8 @@ const DEFAULT_SITE_CONFIG = {
         og_image_url: '',
         favicon_url: '',
         sitemap_enabled: true,
-        sitemap_update_frequency: 'daily'
+        sitemap_update_frequency: 'daily',
+        state_overrides: {}
     },
     // Expert Settings
     expert_settings: {
@@ -96,7 +98,107 @@ export default function AdminDashboard() {
     const [message, setMessage] = useState({ type: '', text: '' })
 
     // Site Config State
-    const [siteConfig, setSiteConfig] = useState(DEFAULT_SITE_CONFIG)
+    const [siteConfig, setSiteConfig] = useState<any>(DEFAULT_SITE_CONFIG)
+    const [selectedSeoState, setSelectedSeoState] = useState('AL')
+    const [isGeneratingSeo, setIsGeneratingSeo] = useState(false)
+    const [seoProgress, setSeoProgress] = useState({ current: 0, total: 0 })
+
+    const US_STATES = [
+        { name: 'Alabama', code: 'AL' }, { name: 'Alaska', code: 'AK' }, { name: 'Arizona', code: 'AZ' }, { name: 'Arkansas', code: 'AR' },
+        { name: 'California', code: 'CA' }, { name: 'Colorado', code: 'CO' }, { name: 'Connecticut', code: 'CT' }, { name: 'Delaware', code: 'DE' },
+        { name: 'Florida', code: 'FL' }, { name: 'Georgia', code: 'GA' }, { name: 'Hawaii', code: 'HI' }, { name: 'Idaho', code: 'ID' },
+        { name: 'Illinois', code: 'IL' }, { name: 'Indiana', code: 'IN' }, { name: 'Iowa', code: 'IA' }, { name: 'Kansas', code: 'KS' },
+        { name: 'Kentucky', code: 'KY' }, { name: 'Louisiana', code: 'LA' }, { name: 'Maine', code: 'ME' }, { name: 'Maryland', code: 'MD' },
+        { name: 'Massachusetts', code: 'MA' }, { name: 'Michigan', code: 'MI' }, { name: 'Minnesota', code: 'MN' }, { name: 'Mississippi', code: 'MS' },
+        { name: 'Missouri', code: 'MO' }, { name: 'Montana', code: 'MT' }, { name: 'Nebraska', code: 'NE' }, { name: 'Nevada', code: 'NV' },
+        { name: 'New Hampshire', code: 'NH' }, { name: 'New Jersey', code: 'NJ' }, { name: 'New Mexico', code: 'NM' }, { name: 'New York', code: 'NY' },
+        { name: 'North Carolina', code: 'NC' }, { name: 'North Dakota', code: 'ND' }, { name: 'Ohio', code: 'OH' }, { name: 'Oklahoma', code: 'OK' },
+        { name: 'Oregon', code: 'OR' }, { name: 'Pennsylvania', code: 'PA' }, { name: 'Rhode Island', code: 'RI' }, { name: 'South Carolina', code: 'SC' },
+        { name: 'South Dakota', code: 'SD' }, { name: 'Tennessee', code: 'TN' }, { name: 'Texas', code: 'TX' }, { name: 'Utah', code: 'UT' },
+        { name: 'Vermont', code: 'VT' }, { name: 'Virginia', code: 'VA' }, { name: 'Washington', code: 'WA' }, { name: 'West Virginia', code: 'WV' },
+        { name: 'Wisconsin', code: 'WI' }, { name: 'Wyoming', code: 'WY' }
+    ]
+
+    const handleGenerateStateSeo = async () => {
+        if (!siteConfig.open_router_key) {
+            setMessage({ type: 'error', text: 'Please add an OpenRouter API key first.' })
+            return
+        }
+
+        setIsGeneratingSeo(true)
+        setSeoProgress({ current: 0, total: US_STATES.length })
+
+        try {
+            const currentOverrides = { ...(siteConfig.seo_settings?.state_overrides || {}) }
+            const nicheName = selectedNiche?.name || 'Local Services'
+            const apiKey = siteConfig.open_router_key
+
+            // Process sequentially with a small delay between each to avoid browser/API throttling
+            for (let i = 0; i < US_STATES.length; i++) {
+                const state = US_STATES[i]
+                setSeoProgress({ current: i + 1, total: US_STATES.length })
+                console.log(`Generating SEO for ${state.name} (${i + 1}/${US_STATES.length})...`)
+
+                try {
+                    // Generate Meta Title
+                    const titleResult = await generateAIContent({
+                        niche: nicheName,
+                        city: '',
+                        state: state.name,
+                        type: 'seo_template',
+                        apiKey: apiKey
+                    })
+
+                    // Generate Meta Description
+                    const descResult = await generateAIContent({
+                        niche: nicheName,
+                        city: '',
+                        state: state.name,
+                        type: 'seo_desc_template',
+                        apiKey: apiKey
+                    })
+
+                    if (titleResult || descResult) {
+                        currentOverrides[state.code] = {
+                            ...(currentOverrides[state.code] || {}),
+                            ...(titleResult ? { meta_title: titleResult } : {}),
+                            ...(descResult ? { meta_description: descResult } : {})
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Failed to generate for ${state.name}:`, err)
+                }
+
+                // Update UI every 3 states so the user sees progress in the list/inputs
+                if (i > 0 && (i === US_STATES.length - 1 || i % 3 === 0)) {
+                    setSiteConfig((prev: any) => ({
+                        ...prev,
+                        seo_settings: {
+                            ...prev.seo_settings,
+                            state_overrides: { ...currentOverrides }
+                        }
+                    }))
+                }
+
+                // Small delay between every request to prevent rate limits
+                await new Promise(r => setTimeout(r, 400))
+            }
+
+            setSiteConfig({
+                ...siteConfig,
+                seo_settings: {
+                    ...siteConfig.seo_settings,
+                    state_overrides: currentOverrides
+                }
+            })
+            setMessage({ type: 'success', text: `Success! Generated templates for all ${US_STATES.length} states.` })
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Error during bulk SEO generation.' })
+        } finally {
+            setIsGeneratingSeo(false)
+            setSeoProgress({ current: 0, total: 0 })
+        }
+    }
 
     // Niche Config State
     const [niches, setNiches] = useState<any[]>([])
@@ -305,7 +407,7 @@ export default function AdminDashboard() {
                 // Update site config with the new homepage intro
                 if (aiData.homepage_intro) {
                     const cleanIntro = aiData.homepage_intro.replace(/```html/g, '').replace(/```/g, '').trim()
-                    setSiteConfig(prev => ({ ...prev, homepage_content: cleanIntro }))
+                    setSiteConfig((prev: any) => ({ ...prev, homepage_content: cleanIntro }))
                 }
 
                 // Save immediately
@@ -826,7 +928,7 @@ export default function AdminDashboard() {
                                                 onSuccess={(result: any) => {
                                                     console.log('Logo Upload Result:', result);
                                                     if (result?.info?.secure_url) {
-                                                        setSiteConfig({ ...siteConfig, logo_url: result.info.secure_url })
+                                                        setSiteConfig((prev: any) => ({ ...prev, logo_url: result.info.secure_url }))
                                                     }
                                                 }}
 
@@ -1096,7 +1198,7 @@ export default function AdminDashboard() {
                                 </h3>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Meta Title Template</label>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Global Meta Title (Fallback)</label>
                                         <input
                                             type="text"
                                             value={siteConfig.seo_settings?.meta_title_state || ''}
@@ -1136,8 +1238,119 @@ export default function AdminDashboard() {
                                 </div>
                             </section>
 
+                            {/* State-Specific SEO Overrides */}
+                            <section className="bg-slate-50 p-8 rounded-3xl border border-slate-200 space-y-6">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div>
+                                        <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900">
+                                            <Bot className="text-blue-600" /> State-Specific SEO Manager
+                                        </h3>
+                                        <p className="text-sm text-slate-500 mt-1">
+                                            Individual state meta titles that take priority over the fallback template above.
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <select
+                                            value={selectedSeoState}
+                                            onChange={(e) => setSelectedSeoState(e.target.value)}
+                                            className="px-4 py-2 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-blue-500 outline-none font-medium"
+                                        >
+                                            {US_STATES.map(state => (
+                                                <option key={state.code} value={state.code}>{state.name}</option>
+                                            ))}
+                                        </select>
+                                        <button
+                                            onClick={handleGenerateStateSeo}
+                                            disabled={isGeneratingSeo}
+                                            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold shadow-sm disabled:opacity-50 min-w-[160px] justify-center"
+                                        >
+                                            {isGeneratingSeo ? (
+                                                <>
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                    {seoProgress.total > 0 ? `${seoProgress.current}/${seoProgress.total}` : 'Starting...'}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Wand2 size={18} />
+                                                    AI Generate All
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                            Editing Template for: <span className="text-blue-600">{US_STATES.find(s => s.code === selectedSeoState)?.name}</span>
+                                        </span>
+                                        {siteConfig.seo_settings?.state_overrides?.[selectedSeoState] && (
+                                            <button
+                                                onClick={() => {
+                                                    const updated = { ...siteConfig.seo_settings.state_overrides }
+                                                    delete updated[selectedSeoState]
+                                                    setSiteConfig({
+                                                        ...siteConfig,
+                                                        seo_settings: { ...siteConfig.seo_settings, state_overrides: updated }
+                                                    })
+                                                }}
+                                                className="text-xs text-red-500 hover:text-red-600 font-bold flex items-center gap-1"
+                                            >
+                                                <Trash2 size={12} /> Reset to Global
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Meta Title Override</label>
+                                        <input
+                                            type="text"
+                                            value={siteConfig.seo_settings?.state_overrides?.[selectedSeoState]?.meta_title || ''}
+                                            onChange={(e) => {
+                                                const updated = {
+                                                    ...(siteConfig.seo_settings?.state_overrides || {}),
+                                                    [selectedSeoState]: {
+                                                        ...(siteConfig.seo_settings?.state_overrides?.[selectedSeoState] || {}),
+                                                        meta_title: e.target.value
+                                                    }
+                                                }
+                                                setSiteConfig({
+                                                    ...siteConfig,
+                                                    seo_settings: { ...siteConfig.seo_settings, state_overrides: updated }
+                                                })
+                                            }}
+                                            placeholder="Using Global Template..."
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Meta Description Override</label>
+                                        <textarea
+                                            value={siteConfig.seo_settings?.state_overrides?.[selectedSeoState]?.meta_description || ''}
+                                            onChange={(e) => {
+                                                const updated = {
+                                                    ...(siteConfig.seo_settings?.state_overrides || {}),
+                                                    [selectedSeoState]: {
+                                                        ...(siteConfig.seo_settings?.state_overrides?.[selectedSeoState] || {}),
+                                                        meta_description: e.target.value
+                                                    }
+                                                }
+                                                setSiteConfig({
+                                                    ...siteConfig,
+                                                    seo_settings: { ...siteConfig.seo_settings, state_overrides: updated }
+                                                })
+                                            }}
+                                            placeholder="Using Global Template..."
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none min-h-[80px]"
+                                        />
+                                        <p className="mt-2 text-xs text-slate-400">
+                                            Tip: Use <code className="bg-slate-100 px-1 rounded">{"{{state}}"}</code> and <code className="bg-slate-100 px-1 rounded">{"{{service}}"}</code>
+                                        </p>
+                                    </div>
+                                </div>
+                            </section >
+
                             {/* City Page SEO */}
-                            <section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+                            <section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6" >
                                 <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900">
                                     <Globe className="text-violet-500" /> City Page SEO
                                 </h3>
@@ -1181,10 +1394,10 @@ export default function AdminDashboard() {
                                         />
                                     </div>
                                 </div>
-                            </section>
+                            </section >
 
                             {/* Service Page SEO */}
-                            <section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+                            < section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6" >
                                 <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900">
                                     <Globe className="text-emerald-500" /> Service Page SEO
                                 </h3>
@@ -1228,8 +1441,8 @@ export default function AdminDashboard() {
                                         />
                                     </div>
                                 </div>
-                            </section>
-                        </div>
+                            </section >
+                        </div >
 
                         <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
                             <h3 className="text-xl font-bold">Assets & Sitemap</h3>
@@ -1257,13 +1470,13 @@ export default function AdminDashboard() {
                                             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
                                             onSuccess={(result: any) => {
                                                 if (result?.info?.secure_url) {
-                                                    setSiteConfig({
-                                                        ...siteConfig,
+                                                    setSiteConfig((prev: any) => ({
+                                                        ...prev,
                                                         seo_settings: {
-                                                            ...siteConfig.seo_settings,
+                                                            ...prev.seo_settings,
                                                             og_image_url: result.info.secure_url
                                                         }
-                                                    })
+                                                    }))
                                                 }
                                             }}
                                         >
@@ -1307,13 +1520,13 @@ export default function AdminDashboard() {
                                             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
                                             onSuccess={(result: any) => {
                                                 if (result?.info?.secure_url) {
-                                                    setSiteConfig({
-                                                        ...siteConfig,
+                                                    setSiteConfig((prev: any) => ({
+                                                        ...prev,
                                                         seo_settings: {
-                                                            ...siteConfig.seo_settings,
+                                                            ...prev.seo_settings,
                                                             favicon_url: result.info.secure_url
                                                         }
-                                                    })
+                                                    }))
                                                 }
                                             }}
                                         >
@@ -1348,802 +1561,810 @@ export default function AdminDashboard() {
                                 Save SEO Settings
                             </button>
                         </div>
-                    </div>
-                )}
-                {activeTab === 'expert' && (
-                    <div className="space-y-8">
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
-                            <h3 className="text-xl font-bold">Expert/Author Information</h3>
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Expert Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="John Smith"
-                                        value={siteConfig.expert_settings?.name || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            expert_settings: {
-                                                ...siteConfig.expert_settings,
-                                                name: e.target.value
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Expert Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="Certified Master Plumber"
-                                        value={siteConfig.expert_settings?.title || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            expert_settings: {
-                                                ...siteConfig.expert_settings,
-                                                title: e.target.value
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Expert Bio (2-3 sentences)
-                                    </label>
-                                    <textarea
-                                        rows={3}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="John Smith is a certified master plumber with over 15 years of experience..."
-                                        value={siteConfig.expert_settings?.bio || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            expert_settings: {
-                                                ...siteConfig.expert_settings,
-                                                bio: e.target.value
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                                        Photo URL
-                                    </label>
-                                    <div className="flex gap-2">
+                    </div >
+                )
+                }
+                {
+                    activeTab === 'expert' && (
+                        <div className="space-y-8">
+                            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+                                <h3 className="text-xl font-bold">Expert/Author Information</h3>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Expert Name
+                                        </label>
                                         <input
                                             type="text"
-                                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                            placeholder="https://example.com/expert.jpg"
-                                            value={siteConfig.expert_settings?.photo_url || ''}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="John Smith"
+                                            value={siteConfig.expert_settings?.name || ''}
                                             onChange={(e) => setSiteConfig({
                                                 ...siteConfig,
                                                 expert_settings: {
                                                     ...siteConfig.expert_settings,
-                                                    photo_url: e.target.value
+                                                    name: e.target.value
                                                 }
                                             })}
                                         />
-                                        <CldUploadWidget
-                                            signatureEndpoint="/api/cloudinary-signature"
-                                            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                                            onSuccess={(result: any) => {
-                                                if (result?.info?.secure_url) {
-                                                    setSiteConfig({
-                                                        ...siteConfig,
-                                                        expert_settings: {
-                                                            ...siteConfig.expert_settings,
-                                                            photo_url: result.info.secure_url
-                                                        }
-                                                    })
-                                                }
-                                            }}
-                                        >
-                                            {({ open }) => (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => open()}
-                                                    className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all text-sm font-bold flex items-center gap-2"
-                                                >
-                                                    <Plus size={16} /> Upload
-                                                </button>
-                                            )}
-                                        </CldUploadWidget>
                                     </div>
-                                    {siteConfig.expert_settings?.photo_url && (
-                                        <div className="mt-2 relative w-20 h-20 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                                            <img src={siteConfig.expert_settings.photo_url} alt="Expert Preview" className="w-full h-full object-cover" />
-                                            <button
-                                                onClick={() => setSiteConfig({
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Expert Title
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="Certified Master Plumber"
+                                            value={siteConfig.expert_settings?.title || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                expert_settings: {
+                                                    ...siteConfig.expert_settings,
+                                                    title: e.target.value
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Expert Bio (2-3 sentences)
+                                        </label>
+                                        <textarea
+                                            rows={3}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="John Smith is a certified master plumber with over 15 years of experience..."
+                                            value={siteConfig.expert_settings?.bio || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                expert_settings: {
+                                                    ...siteConfig.expert_settings,
+                                                    bio: e.target.value
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                                            Photo URL
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                placeholder="https://example.com/expert.jpg"
+                                                value={siteConfig.expert_settings?.photo_url || ''}
+                                                onChange={(e) => setSiteConfig({
                                                     ...siteConfig,
                                                     expert_settings: {
                                                         ...siteConfig.expert_settings,
-                                                        photo_url: ''
+                                                        photo_url: e.target.value
                                                     }
                                                 })}
-                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-sm"
+                                            />
+                                            <CldUploadWidget
+                                                signatureEndpoint="/api/cloudinary-signature"
+                                                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                                                onSuccess={(result: any) => {
+                                                    if (result?.info?.secure_url) {
+                                                        setSiteConfig((prev: any) => ({
+                                                            ...prev,
+                                                            expert_settings: {
+                                                                ...prev.expert_settings,
+                                                                photo_url: result.info.secure_url
+                                                            }
+                                                        }))
+                                                    }
+                                                }}
                                             >
-                                                <X size={10} />
-                                            </button>
+                                                {({ open }) => (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => open()}
+                                                        className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all text-sm font-bold flex items-center gap-2"
+                                                    >
+                                                        <Plus size={16} /> Upload
+                                                    </button>
+                                                )}
+                                            </CldUploadWidget>
                                         </div>
-                                    )}
-                                </div>
+                                        {siteConfig.expert_settings?.photo_url && (
+                                            <div className="mt-2 relative w-20 h-20 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                                                <img src={siteConfig.expert_settings.photo_url} alt="Expert Preview" className="w-full h-full object-cover" />
+                                                <button
+                                                    onClick={() => setSiteConfig({
+                                                        ...siteConfig,
+                                                        expert_settings: {
+                                                            ...siteConfig.expert_settings,
+                                                            photo_url: ''
+                                                        }
+                                                    })}
+                                                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-sm"
+                                                >
+                                                    <X size={10} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        License Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="PL-12345"
-                                        value={siteConfig.expert_settings?.license_number || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            expert_settings: {
-                                                ...siteConfig.expert_settings,
-                                                license_number: e.target.value
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Years of Experience
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="15"
-                                        value={siteConfig.expert_settings?.years_experience || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            expert_settings: {
-                                                ...siteConfig.expert_settings,
-                                                years_experience: parseInt(e.target.value) || 0
-                                            }
-                                        })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end">
-                            <button
-                                onClick={handleSaveSite}
-                                disabled={loading}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
-                            >
-                                {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                                Save Expert Info
-                            </button>
-                        </div>
-                    </div>
-                )
-                }
-                {activeTab === 'trust' && (
-                    <div className="space-y-8">
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
-                            <h3 className="text-xl font-bold">Trust Signals & Social Proof</h3>
-                            <div className="grid md:grid-cols-3 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Years in Business
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="15"
-                                        value={siteConfig.trust_signals?.years_in_business || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            trust_signals: {
-                                                ...siteConfig.trust_signals,
-                                                years_in_business: parseInt(e.target.value) || 0
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Average Rating (out of 5)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        max="5"
-                                        min="0"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="4.8"
-                                        value={siteConfig.trust_signals?.average_rating || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            trust_signals: {
-                                                ...siteConfig.trust_signals,
-                                                average_rating: parseFloat(e.target.value) || 0
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Total Reviews
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="1247"
-                                        value={siteConfig.trust_signals?.total_reviews || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            trust_signals: {
-                                                ...siteConfig.trust_signals,
-                                                total_reviews: parseInt(e.target.value) || 0
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Projects Completed
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="5000"
-                                        value={siteConfig.trust_signals?.projects_completed || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            trust_signals: {
-                                                ...siteConfig.trust_signals,
-                                                projects_completed: parseInt(e.target.value) || 0
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Warranty Details
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="10-Year Warranty on All Installations"
-                                        value={siteConfig.trust_signals?.warranty_details || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            trust_signals: {
-                                                ...siteConfig.trust_signals,
-                                                warranty_details: e.target.value
-                                            }
-                                        })}
-                                    />
-                                </div>
-                                <div className="md:col-span-3">
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Service Guarantee
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="100% Satisfaction Guaranteed or Your Money Back"
-                                        value={siteConfig.trust_signals?.service_guarantee || ''}
-                                        onChange={(e) => setSiteConfig({
-                                            ...siteConfig,
-                                            trust_signals: {
-                                                ...siteConfig.trust_signals,
-                                                service_guarantee: e.target.value
-                                            }
-                                        })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end">
-                            <button
-                                onClick={handleSaveSite}
-                                disabled={loading}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
-                            >
-                                {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                                Save Trust Signals
-                            </button>
-                        </div>
-                    </div>
-                )}
-                )
-                {activeTab === 'niches' && (
-                    <div className="space-y-8">
-                        <div className="flex gap-4 overflow-x-auto pb-4">
-                            {niches.map(n => (
-                                <button
-                                    key={n.slug}
-                                    onClick={() => handleNicheSelect(n)}
-                                    className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${selectedNiche?.slug === n.slug ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'}`}
-                                >
-                                    {n.name}
-                                </button>
-                            ))}
-                            <button
-                                onClick={handleAddNiche}
-                                className="px-6 py-2 rounded-full font-medium bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 flex items-center gap-2"
-                            >
-                                <Plus size={16} /> Add Niche
-                            </button>
-                        </div>
-
-                        {selectedNiche && (
-                            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                                <div className="flex justify-between items-center mb-8">
-                                    <h2 className="text-2xl font-bold">Edit Niche: {selectedNiche.name}</h2>
-                                    <div className="flex gap-3">
-                                        <button
-                                            className="px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-100 transition-all disabled:opacity-50"
-                                            onClick={handleAIGenerate}
-                                            disabled={loading}
-                                        >
-                                            {loading ? <Loader2 className="animate-spin" size={20} /> : <Wand2 size={20} />}
-                                            Generate with AI
-                                        </button>
-                                        <button className="px-6 py-3 bg-red-50 text-red-600 rounded-xl font-bold flex items-center gap-2 hover:bg-red-100 transition-all" onClick={handleDeleteNiche}>
-                                            <Trash2 size={20} /> Delete Niche
-                                        </button>
-                                        <button className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all" onClick={handleSaveNiche}>
-                                            <Save size={20} /> Save Niche
-                                        </button>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            License Number
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="PL-12345"
+                                            value={siteConfig.expert_settings?.license_number || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                expert_settings: {
+                                                    ...siteConfig.expert_settings,
+                                                    license_number: e.target.value
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Years of Experience
+                                        </label>
+                                        <input
+                                            type="number"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="15"
+                                            value={siteConfig.expert_settings?.years_experience || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                expert_settings: {
+                                                    ...siteConfig.expert_settings,
+                                                    years_experience: parseInt(e.target.value) || 0
+                                                }
+                                            })}
+                                        />
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="space-y-6">
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">Niche Name</label>
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                                                value={selectedNiche.name}
-                                                onChange={(e) => setSelectedNiche({ ...selectedNiche, name: e.target.value })}
-                                            />
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleSaveSite}
+                                    disabled={loading}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
+                                >
+                                    {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                                    Save Expert Info
+                                </button>
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    activeTab === 'trust' && (
+                        <div className="space-y-8">
+                            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+                                <h3 className="text-xl font-bold">Trust Signals & Social Proof</h3>
+                                <div className="grid md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Years in Business
+                                        </label>
+                                        <input
+                                            type="number"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="15"
+                                            value={siteConfig.trust_signals?.years_in_business || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                trust_signals: {
+                                                    ...siteConfig.trust_signals,
+                                                    years_in_business: parseInt(e.target.value) || 0
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Average Rating (out of 5)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            max="5"
+                                            min="0"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="4.8"
+                                            value={siteConfig.trust_signals?.average_rating || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                trust_signals: {
+                                                    ...siteConfig.trust_signals,
+                                                    average_rating: parseFloat(e.target.value) || 0
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Total Reviews
+                                        </label>
+                                        <input
+                                            type="number"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="1247"
+                                            value={siteConfig.trust_signals?.total_reviews || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                trust_signals: {
+                                                    ...siteConfig.trust_signals,
+                                                    total_reviews: parseInt(e.target.value) || 0
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Projects Completed
+                                        </label>
+                                        <input
+                                            type="number"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="5000"
+                                            value={siteConfig.trust_signals?.projects_completed || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                trust_signals: {
+                                                    ...siteConfig.trust_signals,
+                                                    projects_completed: parseInt(e.target.value) || 0
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Warranty Details
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="10-Year Warranty on All Installations"
+                                            value={siteConfig.trust_signals?.warranty_details || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                trust_signals: {
+                                                    ...siteConfig.trust_signals,
+                                                    warranty_details: e.target.value
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    <div className="md:col-span-3">
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            Service Guarantee
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="100% Satisfaction Guaranteed or Your Money Back"
+                                            value={siteConfig.trust_signals?.service_guarantee || ''}
+                                            onChange={(e) => setSiteConfig({
+                                                ...siteConfig,
+                                                trust_signals: {
+                                                    ...siteConfig.trust_signals,
+                                                    service_guarantee: e.target.value
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleSaveSite}
+                                    disabled={loading}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
+                                >
+                                    {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                                    Save Trust Signals
+                                </button>
+                            </div>
+                        </div>
+                    )
+                }
+                )
+                {
+                    activeTab === 'niches' && (
+                        <div className="space-y-8">
+                            <div className="flex gap-4 overflow-x-auto pb-4">
+                                {niches.map(n => (
+                                    <button
+                                        key={n.slug}
+                                        onClick={() => handleNicheSelect(n)}
+                                        className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${selectedNiche?.slug === n.slug ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'}`}
+                                    >
+                                        {n.name}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={handleAddNiche}
+                                    className="px-6 py-2 rounded-full font-medium bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Add Niche
+                                </button>
+                            </div>
+
+                            {selectedNiche && (
+                                <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                                    <div className="flex justify-between items-center mb-8">
+                                        <h2 className="text-2xl font-bold">Edit Niche: {selectedNiche.name}</h2>
+                                        <div className="flex gap-3">
+                                            <button
+                                                className="px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-100 transition-all disabled:opacity-50"
+                                                onClick={handleAIGenerate}
+                                                disabled={loading}
+                                            >
+                                                {loading ? <Loader2 className="animate-spin" size={20} /> : <Wand2 size={20} />}
+                                                Generate with AI
+                                            </button>
+                                            <button className="px-6 py-3 bg-red-50 text-red-600 rounded-xl font-bold flex items-center gap-2 hover:bg-red-100 transition-all" onClick={handleDeleteNiche}>
+                                                <Trash2 size={20} /> Delete Niche
+                                            </button>
+                                            <button className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all" onClick={handleSaveNiche}>
+                                                <Save size={20} /> Save Niche
+                                            </button>
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">Niche Slug (URL Identifier)</label>
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                                                value={selectedNiche.slug}
-                                                onChange={(e) => setSelectedNiche({ ...selectedNiche, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">Primary Service</label>
-                                            <input
-                                                type="text"
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                                                value={selectedNiche.primary_service}
-                                                onChange={(e) => setSelectedNiche({ ...selectedNiche, primary_service: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">City Hero Image URL</label>
-                                            <div className="flex gap-2">
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <div className="space-y-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">Niche Name</label>
                                                 <input
                                                     type="text"
-                                                    placeholder="https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png"
-                                                    className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                                                    value={selectedNiche.city_hero_image || 'https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png'}
-                                                    onChange={(e) => setSelectedNiche({ ...selectedNiche, city_hero_image: e.target.value })}
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                                                    value={selectedNiche.name}
+                                                    onChange={(e) => setSelectedNiche({ ...selectedNiche, name: e.target.value })}
                                                 />
-                                                <CldUploadWidget
-                                                    signatureEndpoint="/api/cloudinary-signature"
-                                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                                                    onSuccess={(result: any) => {
-                                                        if (result?.info?.secure_url) {
-                                                            setSelectedNiche({ ...selectedNiche, city_hero_image: result.info.secure_url })
-                                                        }
-                                                    }}
-                                                >
-                                                    {({ open }) => (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => open()}
-                                                            className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all text-sm font-bold flex items-center gap-2"
-                                                        >
-                                                            <Plus size={16} /> Upload
-                                                        </button>
-                                                    )}
-                                                </CldUploadWidget>
                                             </div>
-                                            {selectedNiche.city_hero_image && (
-                                                <div className="mt-2 relative w-48 h-24 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                                                    <img src={selectedNiche.city_hero_image} alt="Hero Preview" className="w-full h-full object-cover" />
-                                                    <button
-                                                        onClick={() => setSelectedNiche({ ...selectedNiche, city_hero_image: '' })}
-                                                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-sm"
-                                                    >
-                                                        <X size={10} />
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">Keywords (Comma separated)</label>
-                                            <textarea
-                                                className="w-full h-24 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                                                value={selectedNiche.keywords?.join(', ')}
-                                                onChange={(e) => setSelectedNiche({ ...selectedNiche, keywords: e.target.value.split(',').map((k: string) => k.trim()) })}
-                                            />
-                                        </div>
-                                        <div className="pt-6 border-t border-slate-100">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h4 className="font-bold text-slate-900 border-l-4 border-blue-500 pl-3">FAQs</h4>
-                                                <button onClick={handleAddFAQ} className="text-blue-600 hover:text-blue-700 text-sm font-bold flex items-center gap-1">
-                                                    <Plus size={16} /> Add FAQ
-                                                </button>
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">Niche Slug (URL Identifier)</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                                                    value={selectedNiche.slug}
+                                                    onChange={(e) => setSelectedNiche({ ...selectedNiche, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                                                />
                                             </div>
-                                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                                                {selectedNiche.faqs?.map((faq: any, index: number) => (
-                                                    <div key={index} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Question"
-                                                            className="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-sm font-bold"
-                                                            value={faq.question}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...selectedNiche.faqs]
-                                                                newFaqs[index].question = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Answer"
-                                                            className="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs h-16"
-                                                            value={faq.answer}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...selectedNiche.faqs]
-                                                                newFaqs[index].answer = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <button
-                                                            onClick={() => {
-                                                                const newFaqs = selectedNiche.faqs.filter((_: any, i: number) => i !== index)
-                                                                setSelectedNiche({ ...selectedNiche, faqs: newFaqs })
-                                                            }}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
-                                                        >
-                                                            <Trash2 size={12} /> Remove FAQ
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">Primary Service</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                                                    value={selectedNiche.primary_service}
+                                                    onChange={(e) => setSelectedNiche({ ...selectedNiche, primary_service: e.target.value })}
+                                                />
                                             </div>
-                                        </div>
-
-                                        <div className="pt-6 border-t border-slate-100">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h4 className="font-bold text-slate-900 border-l-4 border-purple-500 pl-3">Home Page FAQs</h4>
-                                                <button onClick={() => setSelectedNiche({ ...selectedNiche, home_faqs: [...(selectedNiche.home_faqs || []), { question: 'New Question', answer: '' }] })} className="text-purple-600 hover:text-purple-700 text-sm font-bold flex items-center gap-1">
-                                                    <Plus size={16} /> Add Home FAQ
-                                                </button>
-                                            </div>
-                                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                                                {selectedNiche.home_faqs?.map((faq: any, index: number) => (
-                                                    <div key={index} className="p-4 bg-purple-50 rounded-2xl border border-purple-100 space-y-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Question"
-                                                            className="w-full px-3 py-1 bg-white border border-purple-200 rounded-lg text-sm font-bold"
-                                                            value={faq.question}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...(selectedNiche.home_faqs || [])]
-                                                                newFaqs[index].question = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, home_faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Answer"
-                                                            className="w-full px-3 py-1 bg-white border border-purple-200 rounded-lg text-xs h-16"
-                                                            value={faq.answer}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...(selectedNiche.home_faqs || [])]
-                                                                newFaqs[index].answer = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, home_faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <button
-                                                            onClick={() => {
-                                                                const newFaqs = selectedNiche.home_faqs.filter((_: any, i: number) => i !== index)
-                                                                setSelectedNiche({ ...selectedNiche, home_faqs: newFaqs })
-                                                            }}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
-                                                        >
-                                                            <Trash2 size={12} /> Remove
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-6 border-t border-slate-100">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h4 className="font-bold text-slate-900 border-l-4 border-indigo-500 pl-3">State Page FAQs</h4>
-                                                <button onClick={() => setSelectedNiche({ ...selectedNiche, state_faqs: [...(selectedNiche.state_faqs || []), { question: 'New Question', answer: '' }] })} className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1">
-                                                    <Plus size={16} /> Add State FAQ
-                                                </button>
-                                            </div>
-                                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                                                {selectedNiche.state_faqs?.map((faq: any, index: number) => (
-                                                    <div key={index} className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Question"
-                                                            className="w-full px-3 py-1 bg-white border border-indigo-200 rounded-lg text-sm font-bold"
-                                                            value={faq.question}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...(selectedNiche.state_faqs || [])]
-                                                                newFaqs[index].question = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, state_faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Answer"
-                                                            className="w-full px-3 py-1 bg-white border border-indigo-200 rounded-lg text-xs h-16"
-                                                            value={faq.answer}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...(selectedNiche.state_faqs || [])]
-                                                                newFaqs[index].answer = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, state_faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <button
-                                                            onClick={() => {
-                                                                const newFaqs = selectedNiche.state_faqs.filter((_: any, i: number) => i !== index)
-                                                                setSelectedNiche({ ...selectedNiche, state_faqs: newFaqs })
-                                                            }}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
-                                                        >
-                                                            <Trash2 size={12} /> Remove
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-6 border-t border-slate-100">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h4 className="font-bold text-slate-900 border-l-4 border-cyan-500 pl-3">City Page FAQs</h4>
-                                                <button onClick={() => setSelectedNiche({ ...selectedNiche, city_faqs: [...(selectedNiche.city_faqs || []), { question: 'New Question', answer: '' }] })} className="text-cyan-600 hover:text-cyan-700 text-sm font-bold flex items-center gap-1">
-                                                    <Plus size={16} /> Add City FAQ
-                                                </button>
-                                            </div>
-                                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                                                {selectedNiche.city_faqs?.map((faq: any, index: number) => (
-                                                    <div key={index} className="p-4 bg-cyan-50 rounded-2xl border border-cyan-100 space-y-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Question"
-                                                            className="w-full px-3 py-1 bg-white border border-cyan-200 rounded-lg text-sm font-bold"
-                                                            value={faq.question}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...(selectedNiche.city_faqs || [])]
-                                                                newFaqs[index].question = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, city_faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Answer"
-                                                            className="w-full px-3 py-1 bg-white border border-cyan-200 rounded-lg text-xs h-16"
-                                                            value={faq.answer}
-                                                            onChange={(e) => {
-                                                                const newFaqs = [...(selectedNiche.city_faqs || [])]
-                                                                newFaqs[index].answer = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, city_faqs: newFaqs })
-                                                            }}
-                                                        />
-                                                        <button
-                                                            onClick={() => {
-                                                                const newFaqs = selectedNiche.city_faqs.filter((_: any, i: number) => i !== index)
-                                                                setSelectedNiche({ ...selectedNiche, city_faqs: newFaqs })
-                                                            }}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
-                                                        >
-                                                            <Trash2 size={12} /> Remove
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-6">
-                                        <div className="flex justify-between items-center">
-                                            <h4 className="font-bold text-slate-900 border-l-4 border-blue-500 pl-3">Services</h4>
-                                            <button onClick={handleAddService} className="text-blue-600 hover:text-blue-700 text-sm font-bold flex items-center gap-1">
-                                                <Plus size={16} /> Add Service
-                                            </button>
-                                        </div>
-                                        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-hide">
-                                            {selectedNiche.services?.map((service: any, index: number) => (
-                                                <div key={index} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Service Title"
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold"
-                                                            value={service.title}
-                                                            onChange={(e) => {
-                                                                const newServices = [...selectedNiche.services]
-                                                                newServices[index].title = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                            }}
-                                                        />
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Icon (e.g. 🪠)"
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-center text-lg"
-                                                            value={service.icon || ''}
-                                                            onChange={(e) => {
-                                                                const newServices = [...selectedNiche.services]
-                                                                newServices[index].icon = e.target.value
-                                                                setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                            }}
-                                                        />
-                                                    </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">City Hero Image URL</label>
+                                                <div className="flex gap-2">
                                                     <input
                                                         type="text"
-                                                        placeholder="Slug (e.g. drain-cleaning)"
-                                                        className="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono"
-                                                        value={service.slug}
-                                                        onChange={(e) => {
-                                                            const newServices = [...selectedNiche.services]
-                                                            newServices[index].slug = e.target.value
-                                                            setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                        }}
+                                                        placeholder="https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png"
+                                                        className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                                                        value={selectedNiche.city_hero_image || 'https://i.ibb.co/Z6Wgrtzs/Premium-Gutter-Installation.png'}
+                                                        onChange={(e) => setSelectedNiche({ ...selectedNiche, city_hero_image: e.target.value })}
                                                     />
-                                                    <div className="space-y-2">
-                                                        <div className="flex gap-2">
+                                                    <CldUploadWidget
+                                                        signatureEndpoint="/api/cloudinary-signature"
+                                                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                                                        onSuccess={(result: any) => {
+                                                            if (result?.info?.secure_url) {
+                                                                setSelectedNiche((prev: any) => ({ ...prev, city_hero_image: result.info.secure_url }))
+                                                            }
+                                                        }}
+                                                    >
+                                                        {({ open }) => (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => open()}
+                                                                className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-all text-sm font-bold flex items-center gap-2"
+                                                            >
+                                                                <Plus size={16} /> Upload
+                                                            </button>
+                                                        )}
+                                                    </CldUploadWidget>
+                                                </div>
+                                                {selectedNiche.city_hero_image && (
+                                                    <div className="mt-2 relative w-48 h-24 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                                                        <img src={selectedNiche.city_hero_image} alt="Hero Preview" className="w-full h-full object-cover" />
+                                                        <button
+                                                            onClick={() => setSelectedNiche({ ...selectedNiche, city_hero_image: '' })}
+                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-sm"
+                                                        >
+                                                            <X size={10} />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-700 mb-1">Keywords (Comma separated)</label>
+                                                <textarea
+                                                    className="w-full h-24 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                                                    value={selectedNiche.keywords?.join(', ')}
+                                                    onChange={(e) => setSelectedNiche({ ...selectedNiche, keywords: e.target.value.split(',').map((k: string) => k.trim()) })}
+                                                />
+                                            </div>
+                                            <div className="pt-6 border-t border-slate-100">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h4 className="font-bold text-slate-900 border-l-4 border-blue-500 pl-3">FAQs</h4>
+                                                    <button onClick={handleAddFAQ} className="text-blue-600 hover:text-blue-700 text-sm font-bold flex items-center gap-1">
+                                                        <Plus size={16} /> Add FAQ
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                                                    {selectedNiche.faqs?.map((faq: any, index: number) => (
+                                                        <div key={index} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
                                                             <input
                                                                 type="text"
-                                                                placeholder="Hero Image URL (e.g. Unsplash URL)"
-                                                                className="flex-1 px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono"
-                                                                value={service.heroImage || service.hero_image || ''}
+                                                                placeholder="Question"
+                                                                className="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-sm font-bold"
+                                                                value={faq.question}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...selectedNiche.faqs]
+                                                                    newFaqs[index].question = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <textarea
+                                                                placeholder="Answer"
+                                                                className="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs h-16"
+                                                                value={faq.answer}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...selectedNiche.faqs]
+                                                                    newFaqs[index].answer = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newFaqs = selectedNiche.faqs.filter((_: any, i: number) => i !== index)
+                                                                    setSelectedNiche({ ...selectedNiche, faqs: newFaqs })
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
+                                                            >
+                                                                <Trash2 size={12} /> Remove FAQ
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-6 border-t border-slate-100">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h4 className="font-bold text-slate-900 border-l-4 border-purple-500 pl-3">Home Page FAQs</h4>
+                                                    <button onClick={() => setSelectedNiche({ ...selectedNiche, home_faqs: [...(selectedNiche.home_faqs || []), { question: 'New Question', answer: '' }] })} className="text-purple-600 hover:text-purple-700 text-sm font-bold flex items-center gap-1">
+                                                        <Plus size={16} /> Add Home FAQ
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                                                    {selectedNiche.home_faqs?.map((faq: any, index: number) => (
+                                                        <div key={index} className="p-4 bg-purple-50 rounded-2xl border border-purple-100 space-y-2">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Question"
+                                                                className="w-full px-3 py-1 bg-white border border-purple-200 rounded-lg text-sm font-bold"
+                                                                value={faq.question}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...(selectedNiche.home_faqs || [])]
+                                                                    newFaqs[index].question = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, home_faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <textarea
+                                                                placeholder="Answer"
+                                                                className="w-full px-3 py-1 bg-white border border-purple-200 rounded-lg text-xs h-16"
+                                                                value={faq.answer}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...(selectedNiche.home_faqs || [])]
+                                                                    newFaqs[index].answer = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, home_faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newFaqs = selectedNiche.home_faqs.filter((_: any, i: number) => i !== index)
+                                                                    setSelectedNiche({ ...selectedNiche, home_faqs: newFaqs })
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
+                                                            >
+                                                                <Trash2 size={12} /> Remove
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-6 border-t border-slate-100">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h4 className="font-bold text-slate-900 border-l-4 border-indigo-500 pl-3">State Page FAQs</h4>
+                                                    <button onClick={() => setSelectedNiche({ ...selectedNiche, state_faqs: [...(selectedNiche.state_faqs || []), { question: 'New Question', answer: '' }] })} className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1">
+                                                        <Plus size={16} /> Add State FAQ
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                                                    {selectedNiche.state_faqs?.map((faq: any, index: number) => (
+                                                        <div key={index} className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-2">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Question"
+                                                                className="w-full px-3 py-1 bg-white border border-indigo-200 rounded-lg text-sm font-bold"
+                                                                value={faq.question}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...(selectedNiche.state_faqs || [])]
+                                                                    newFaqs[index].question = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, state_faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <textarea
+                                                                placeholder="Answer"
+                                                                className="w-full px-3 py-1 bg-white border border-indigo-200 rounded-lg text-xs h-16"
+                                                                value={faq.answer}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...(selectedNiche.state_faqs || [])]
+                                                                    newFaqs[index].answer = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, state_faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newFaqs = selectedNiche.state_faqs.filter((_: any, i: number) => i !== index)
+                                                                    setSelectedNiche({ ...selectedNiche, state_faqs: newFaqs })
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
+                                                            >
+                                                                <Trash2 size={12} /> Remove
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-6 border-t border-slate-100">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h4 className="font-bold text-slate-900 border-l-4 border-cyan-500 pl-3">City Page FAQs</h4>
+                                                    <button onClick={() => setSelectedNiche({ ...selectedNiche, city_faqs: [...(selectedNiche.city_faqs || []), { question: 'New Question', answer: '' }] })} className="text-cyan-600 hover:text-cyan-700 text-sm font-bold flex items-center gap-1">
+                                                        <Plus size={16} /> Add City FAQ
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                                                    {selectedNiche.city_faqs?.map((faq: any, index: number) => (
+                                                        <div key={index} className="p-4 bg-cyan-50 rounded-2xl border border-cyan-100 space-y-2">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Question"
+                                                                className="w-full px-3 py-1 bg-white border border-cyan-200 rounded-lg text-sm font-bold"
+                                                                value={faq.question}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...(selectedNiche.city_faqs || [])]
+                                                                    newFaqs[index].question = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, city_faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <textarea
+                                                                placeholder="Answer"
+                                                                className="w-full px-3 py-1 bg-white border border-cyan-200 rounded-lg text-xs h-16"
+                                                                value={faq.answer}
+                                                                onChange={(e) => {
+                                                                    const newFaqs = [...(selectedNiche.city_faqs || [])]
+                                                                    newFaqs[index].answer = e.target.value
+                                                                    setSelectedNiche({ ...selectedNiche, city_faqs: newFaqs })
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newFaqs = selectedNiche.city_faqs.filter((_: any, i: number) => i !== index)
+                                                                    setSelectedNiche({ ...selectedNiche, city_faqs: newFaqs })
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1"
+                                                            >
+                                                                <Trash2 size={12} /> Remove
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <div className="flex justify-between items-center">
+                                                <h4 className="font-bold text-slate-900 border-l-4 border-blue-500 pl-3">Services</h4>
+                                                <button onClick={handleAddService} className="text-blue-600 hover:text-blue-700 text-sm font-bold flex items-center gap-1">
+                                                    <Plus size={16} /> Add Service
+                                                </button>
+                                            </div>
+                                            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-hide">
+                                                {selectedNiche.services?.map((service: any, index: number) => (
+                                                    <div key={index} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Service Title"
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold"
+                                                                value={service.title}
                                                                 onChange={(e) => {
                                                                     const newServices = [...selectedNiche.services]
-                                                                    newServices[index].heroImage = e.target.value
+                                                                    newServices[index].title = e.target.value
                                                                     setSelectedNiche({ ...selectedNiche, services: newServices })
                                                                 }}
                                                             />
-                                                            <CldUploadWidget
-                                                                signatureEndpoint="/api/cloudinary-signature"
-                                                                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                                                                onSuccess={(result: any) => {
-                                                                    if (result?.info?.secure_url) {
-                                                                        const newServices = [...selectedNiche.services]
-                                                                        newServices[index].heroImage = result.info.secure_url
-                                                                        setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {({ open }) => (
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => open()}
-                                                                        className="px-2 py-1 bg-slate-200 text-slate-800 rounded hover:bg-slate-300 transition-all text-[10px] font-bold"
-                                                                    >
-                                                                        Upload
-                                                                    </button>
-                                                                )}
-                                                            </CldUploadWidget>
-                                                        </div>
-                                                        {(service.heroImage || service.hero_image) && (
-                                                            <div className="relative w-20 h-12 bg-slate-100 rounded overflow-hidden border border-slate-200">
-                                                                <img src={service.heroImage || service.hero_image} alt="Service Preview" className="w-full h-full object-cover" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <textarea
-                                                        placeholder="Short Description"
-                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs h-16"
-                                                        value={service.description}
-                                                        onChange={(e) => {
-                                                            const newServices = [...selectedNiche.services]
-                                                            newServices[index].description = e.target.value
-                                                            setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                        }}
-                                                    />
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <textarea
-                                                            placeholder="Key Features (one per line)"
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
-                                                            value={Array.isArray(service.features) ? service.features.join('\n') : ''}
-                                                            onChange={(e) => {
-                                                                const newServices = [...selectedNiche.services]
-                                                                newServices[index].features = e.target.value.split('\n').filter(Boolean)
-                                                                setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                            }}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Benefits (one per line)"
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
-                                                            value={Array.isArray(service.benefits) ? service.benefits.join('\n') : ''}
-                                                            onChange={(e) => {
-                                                                const newServices = [...selectedNiche.services]
-                                                                newServices[index].benefits = e.target.value.split('\n').filter(Boolean)
-                                                                setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <textarea
-                                                            placeholder="Process Steps (one per line)"
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
-                                                            value={Array.isArray(service.process) ? service.process.join('\n') : ''}
-                                                            onChange={(e) => {
-                                                                const newServices = [...selectedNiche.services]
-                                                                newServices[index].process = e.target.value.split('\n').filter(Boolean)
-                                                                setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                            }}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Materials (JSON: [{name, desc}])"
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
-                                                            value={JSON.stringify(service.materials || [], null, 2)}
-                                                            onChange={(e) => {
-                                                                try {
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Icon (e.g. 🪠)"
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-center text-lg"
+                                                                value={service.icon || ''}
+                                                                onChange={(e) => {
                                                                     const newServices = [...selectedNiche.services]
-                                                                    newServices[index].materials = JSON.parse(e.target.value)
+                                                                    newServices[index].icon = e.target.value
                                                                     setSelectedNiche({ ...selectedNiche, services: newServices })
-                                                                } catch (err) { }
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    {/* Service FAQs Field */}
-                                                    <div className="mt-3">
-                                                        <label className="text-[10px] font-medium text-slate-600 mb-1 block">Service FAQs (one Q:A per line, format: Question | Answer)</label>
-                                                        <textarea
-                                                            placeholder="How much does this cost? | Pricing varies based on scope..."
-                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-32 font-mono"
-                                                            value={
-                                                                Array.isArray(service.faqs)
-                                                                    ? service.faqs.map((f: any) => `${f.question || f.q} | ${f.answer || f.a}`).join('\n')
-                                                                    : ''
-                                                            }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Slug (e.g. drain-cleaning)"
+                                                            className="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono"
+                                                            value={service.slug}
                                                             onChange={(e) => {
                                                                 const newServices = [...selectedNiche.services]
-                                                                newServices[index].faqs = e.target.value.split('\n').filter(Boolean).map(line => {
-                                                                    const [q, a] = line.split('|').map(s => s.trim())
-                                                                    return { question: q || '', answer: a || '' }
-                                                                })
+                                                                newServices[index].slug = e.target.value
                                                                 setSelectedNiche({ ...selectedNiche, services: newServices })
                                                             }}
                                                         />
-                                                    </div>
-                                                    <div className="flex justify-end">
-                                                        <button
-                                                            onClick={() => {
-                                                                const newServices = selectedNiche.services.filter((_: any, i: number) => i !== index)
+                                                        <div className="space-y-2">
+                                                            <div className="flex gap-2">
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Hero Image URL (e.g. Unsplash URL)"
+                                                                    className="flex-1 px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono"
+                                                                    value={service.heroImage || service.hero_image || ''}
+                                                                    onChange={(e) => {
+                                                                        const newServices = [...selectedNiche.services]
+                                                                        newServices[index].heroImage = e.target.value
+                                                                        setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                    }}
+                                                                />
+                                                                <CldUploadWidget
+                                                                    signatureEndpoint="/api/cloudinary-signature"
+                                                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                                                                    onSuccess={(result: any) => {
+                                                                        if (result?.info?.secure_url) {
+                                                                            setSelectedNiche((prev: any) => {
+                                                                                const newServices = [...prev.services]
+                                                                                newServices[index].heroImage = result.info.secure_url
+                                                                                return { ...prev, services: newServices }
+                                                                            })
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {({ open }) => (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => open()}
+                                                                            className="px-2 py-1 bg-slate-200 text-slate-800 rounded hover:bg-slate-300 transition-all text-[10px] font-bold"
+                                                                        >
+                                                                            Upload
+                                                                        </button>
+                                                                    )}
+                                                                </CldUploadWidget>
+                                                            </div>
+                                                            {(service.heroImage || service.hero_image) && (
+                                                                <div className="relative w-20 h-12 bg-slate-100 rounded overflow-hidden border border-slate-200">
+                                                                    <img src={service.heroImage || service.hero_image} alt="Service Preview" className="w-full h-full object-cover" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <textarea
+                                                            placeholder="Short Description"
+                                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs h-16"
+                                                            value={service.description}
+                                                            onChange={(e) => {
+                                                                const newServices = [...selectedNiche.services]
+                                                                newServices[index].description = e.target.value
                                                                 setSelectedNiche({ ...selectedNiche, services: newServices })
                                                             }}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1"
-                                                        >
-                                                            <Trash2 size={12} /> Remove Service
-                                                        </button>
+                                                        />
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <textarea
+                                                                placeholder="Key Features (one per line)"
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
+                                                                value={Array.isArray(service.features) ? service.features.join('\n') : ''}
+                                                                onChange={(e) => {
+                                                                    const newServices = [...selectedNiche.services]
+                                                                    newServices[index].features = e.target.value.split('\n').filter(Boolean)
+                                                                    setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                }}
+                                                            />
+                                                            <textarea
+                                                                placeholder="Benefits (one per line)"
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
+                                                                value={Array.isArray(service.benefits) ? service.benefits.join('\n') : ''}
+                                                                onChange={(e) => {
+                                                                    const newServices = [...selectedNiche.services]
+                                                                    newServices[index].benefits = e.target.value.split('\n').filter(Boolean)
+                                                                    setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <textarea
+                                                                placeholder="Process Steps (one per line)"
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
+                                                                value={Array.isArray(service.process) ? service.process.join('\n') : ''}
+                                                                onChange={(e) => {
+                                                                    const newServices = [...selectedNiche.services]
+                                                                    newServices[index].process = e.target.value.split('\n').filter(Boolean)
+                                                                    setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                }}
+                                                            />
+                                                            <textarea
+                                                                placeholder="Materials (JSON: [{name, desc}])"
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-24 font-mono"
+                                                                value={JSON.stringify(service.materials || [], null, 2)}
+                                                                onChange={(e) => {
+                                                                    try {
+                                                                        const newServices = [...selectedNiche.services]
+                                                                        newServices[index].materials = JSON.parse(e.target.value)
+                                                                        setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                    } catch (err) { }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        {/* Service FAQs Field */}
+                                                        <div className="mt-3">
+                                                            <label className="text-[10px] font-medium text-slate-600 mb-1 block">Service FAQs (one Q:A per line, format: Question | Answer)</label>
+                                                            <textarea
+                                                                placeholder="How much does this cost? | Pricing varies based on scope..."
+                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] h-32 font-mono"
+                                                                value={
+                                                                    Array.isArray(service.faqs)
+                                                                        ? service.faqs.map((f: any) => `${f.question || f.q} | ${f.answer || f.a}`).join('\n')
+                                                                        : ''
+                                                                }
+                                                                onChange={(e) => {
+                                                                    const newServices = [...selectedNiche.services]
+                                                                    newServices[index].faqs = e.target.value.split('\n').filter(Boolean).map(line => {
+                                                                        const [q, a] = line.split('|').map(s => s.trim())
+                                                                        return { question: q || '', answer: a || '' }
+                                                                    })
+                                                                    setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex justify-end">
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newServices = selectedNiche.services.filter((_: any, i: number) => i !== index)
+                                                                    setSelectedNiche({ ...selectedNiche, services: newServices })
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1"
+                                                            >
+                                                                <Trash2 size={12} /> Remove Service
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </main>
-        </div>
+                            )}
+                        </div>
+                    )
+                }
+            </main >
+        </div >
     )
 }

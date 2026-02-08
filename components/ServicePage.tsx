@@ -9,7 +9,6 @@ import CoverageStats from '@/components/CoverageStats'
 import Breadcrumb from '@/components/Breadcrumb'
 import CityMap from '@/components/CityMap'
 import InternalLinks from '@/components/InternalLinks'
-import TrustBadges from '@/components/TrustBadges'
 import AuthoritySignals from '@/components/AuthoritySignals'
 import TopBusinesses from '@/components/TopBusinesses'
 import { getSiteConfig } from '@/lib/site-config'
@@ -414,7 +413,6 @@ export default async function ServicePage({ city, state, stateCode, zipCodes, re
             </section>
 
             <InternalLinks currentCity={formattedCity} stateCode={stateCode} relatedCities={relatedCities} />
-            <TrustBadges />
             <Footer city={formattedCity} stateCode={stateCode} />
         </div >
     )

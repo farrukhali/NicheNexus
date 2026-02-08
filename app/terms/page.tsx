@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import Footer from '@/components/Footer'
-import TrustBadges from '@/components/TrustBadges'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
 import { replacePlaceholders } from '@/lib/seo-utils'
@@ -118,7 +117,6 @@ export default async function TermsPage() {
                 </div>
             </main>
 
-            <TrustBadges />
             <Footer />
         </div>
     )

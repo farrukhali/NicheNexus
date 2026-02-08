@@ -191,8 +191,23 @@ export async function getSEOContent(
                 h1Template = s.h1_template_home || `Find {{service}} Near Me`;
                 break;
             case 'state':
-                metaTitleTemplate = s.meta_title_state || metaTitleTemplate;
-                metaDescTemplate = s.meta_description_state || metaDescTemplate;
+                // Check for state-specific overrides first
+                if (code) {
+                    if (s.state_overrides?.[code]?.meta_title) {
+                        metaTitleTemplate = s.state_overrides[code].meta_title;
+                    } else {
+                        metaTitleTemplate = s.meta_title_state || metaTitleTemplate;
+                    }
+
+                    if (s.state_overrides?.[code]?.meta_description) {
+                        metaDescTemplate = s.state_overrides[code].meta_description;
+                    } else {
+                        metaDescTemplate = s.meta_description_state || metaDescTemplate;
+                    }
+                } else {
+                    metaTitleTemplate = s.meta_title_state || metaTitleTemplate;
+                    metaDescTemplate = s.meta_description_state || metaDescTemplate;
+                }
                 h1Template = s.h1_template_state || `{{service}} in {{state}} | Local Experts`;
                 break;
             case 'city':

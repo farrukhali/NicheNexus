@@ -3,8 +3,6 @@ import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Breadcrumb from '@/components/Breadcrumb'
-import TrustBadges from '@/components/TrustBadges'
-import { NavbarCallBtn } from '@/components/CallBtn'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import RelatedServices from '@/components/RelatedServices'
@@ -238,7 +236,6 @@ export default async function StatePage(props: StatePageProps) {
             </div>
 
 
-            <TrustBadges />
             <Footer stateCode={stateCode} />
         </div >
     )

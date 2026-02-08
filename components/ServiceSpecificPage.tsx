@@ -3,7 +3,6 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import RelatedServices from '@/components/RelatedServices'
-import TrustBadges from '@/components/TrustBadges'
 import { CallBtn, NavbarCallBtn } from '@/components/CallBtn'
 import Breadcrumb from '@/components/Breadcrumb'
 import { ServiceDetail } from '@/lib/services-data'
@@ -431,7 +430,6 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                 </div>
             </section>
 
-            <TrustBadges />
             <RelatedServices city={formattedCity} state={stateCode} />
             <Footer city={formattedCity} stateCode={stateCode} />
         </div>
