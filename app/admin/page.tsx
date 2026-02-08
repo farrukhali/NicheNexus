@@ -213,12 +213,43 @@ export default function AdminDashboard() {
 
         // If we don't have an ID (e.g. new niche config), we try to find one by niche_slug 
         // to avoid duplicate domain errors if niche_slug already exists.
-        if (!savePayload.id && savePayload.niche_slug) {
-            const { data: existing } = await supabase
-                .from('site_configs')
-                .select('id')
-                .eq('niche_slug', savePayload.niche_slug)
-                .single()
+        // Check for existing record by niche_slug OR domain to prevent duplicates
+        if (!savePayload.id) {
+            let existing = null
+
+            // 1. Try finding by niche_slug first (strongest link)
+            if (savePayload.niche_slug) {
+                const { data } = await supabase
+                    .from('site_configs')
+                    .select('id')
+                    .eq('niche_slug', savePayload.niche_slug)
+                    .single()
+                existing = data
+            }
+
+            // 2. If not found, try finding by domain (unique constraint)
+            if (!existing && savePayload.domain) {
+                const { data } = await supabase
+                    .from('site_configs')
+                    .select('id, niche_slug') // Select niche_slug to check ownership
+                    .eq('domain', savePayload.domain)
+                    .single()
+
+                if (data) {
+                    // CRITICAL CHECK: If this domain belongs to ANOTHER niche, do NOT overwrite it!
+                    if (data.niche_slug && data.niche_slug !== savePayload.niche_slug) {
+                        setLoading(false)
+                        setMessage({
+                            type: 'error',
+                            text: `Domain '${savePayload.domain}' is already used by the '${data.niche_slug}' niche. Please use a different domain.`
+                        })
+                        setTimeout(() => setMessage({ type: '', text: '' }), 5000)
+                        return // Stop execution
+                    }
+                    existing = data
+                }
+            }
+
             if (existing) {
                 savePayload.id = existing.id
             }
@@ -551,6 +582,17 @@ export default function AdminDashboard() {
 
                 {activeTab === 'site' && (
                     <>
+                        <div className="flex gap-4 overflow-x-auto pb-4 mb-6">
+                            {niches.map(n => (
+                                <button
+                                    key={n.slug}
+                                    onClick={() => handleNicheSelect(n)}
+                                    className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${selectedNiche?.slug === n.slug ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'}`}
+                                >
+                                    {n.name}
+                                </button>
+                            ))}
+                        </div>
                         <div className="grid lg:grid-cols-2 gap-8">
                             <section className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
                                 <h3 className="text-xl font-bold flex items-center gap-2">
