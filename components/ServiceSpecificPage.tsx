@@ -56,6 +56,8 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
         whatIs: replacePlaceholders(service.description(formattedCity, formattedState), placeholderVars),
         process: replacePlaceholdersInArray(service.process || [], placeholderVars),
         materials: replacePlaceholdersInMaterials(service.materials || [], placeholderVars),
+        features: replacePlaceholdersInArray(service.features || [], placeholderVars),
+        benefits: replacePlaceholdersInArray(service.benefits || [], placeholderVars),
         faqs: service.faqs || [],
         priceRange: "$200 - $2,500+", // Standard range, could be made dynamic
         duration: "Same Day service available",
@@ -230,7 +232,7 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                         Key Features of Our {service.title} in {formattedCity}
                     </h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {service.features.map((feature, i) => (
+                        {extendedContent.features.map((feature, i) => (
                             <div key={i} className="p-6 bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
                                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-2xl mb-4 group-hover:scale-110 transition-transform">
                                     {service.icon}
@@ -287,7 +289,7 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                         Benefits of Professional {service.title} in {formattedCity}
                     </h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {service.benefits.map((benefit, i) => (
+                        {extendedContent.benefits.map((benefit, i) => (
                             <div key={i} className="p-8 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-100 shadow-sm hover:shadow-md transition-all">
                                 <div className="text-3xl mb-4">
                                     {['✅', '⭐', '🏆', '💎'][i % 4]}
