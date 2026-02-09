@@ -36,6 +36,16 @@ body {
   }
 }
 
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+
 .animate-bounce-slow {
   animation: bounce-slow 3s infinite;
+}
+
+.animate-shine {
+  animation: shine 1.5s infinite;
 }

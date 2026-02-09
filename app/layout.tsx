@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 import { headers } from 'next/headers';
+import FloatingMobileCTA from "@/components/FloatingMobileCTA";
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteConfig = await getSiteConfig();
@@ -85,6 +86,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <FloatingMobileCTA phone={siteConfig.contactPhone} />
       </body>
     </html>
   );
