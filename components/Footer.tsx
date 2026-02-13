@@ -35,7 +35,7 @@ export default async function Footer({ city, stateCode }: FooterProps) {
                 <div className="grid md:grid-cols-4 gap-12 mb-12">
                     <div className="col-span-1 md:col-span-1">
                         {siteConfig.logoUrl ? (
-                            <img src={siteConfig.logoUrl} alt={siteConfig.siteName} className="h-10 mb-6 brightness-0 invert" />
+                            <img src={siteConfig.logoUrl} alt={siteConfig.siteName} className="h-10 mb-6 brightness-0" />
                         ) : (
                             <h4 className="text-white font-bold text-xl mb-6">{siteConfig.siteName}</h4>
                         )}
