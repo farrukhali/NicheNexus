@@ -46,7 +46,15 @@ async function getUrls() {
     // City pages
     if (cities) {
         cities.forEach(record => {
-            const citySlug = record.city.toLowerCase().replace(/ /g, '-')
+            const citySlug = record.city
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '')
             const stateSlug = record.state_id.toLowerCase()
             urls.push(`${SITE_URL}/${stateSlug}/${citySlug}`)
         })

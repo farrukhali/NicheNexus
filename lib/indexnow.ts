@@ -1,6 +1,7 @@
 // IndexNow API Integration for Faster Indexing
 // This notifies Bing/Yandex instantly when pages are updated
 import { getSiteConfig } from './site-config'
+import { toAsciiSlug } from './slug-utils'
 
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY || 'your-indexnow-key-here'
 
@@ -52,7 +53,7 @@ export async function submitStateUrls(stateCode: string, cities: string[]): Prom
     const SITE_URL = `https://${siteConfig.domain}`
     const urls = [
         `${SITE_URL}/${stateCode}`, // State page
-        ...cities.map(city => `${SITE_URL}/${stateCode}/${city.toLowerCase().replace(/\s+/g, '-')}`),
+        ...cities.map(city => `${SITE_URL}/${stateCode}/${toAsciiSlug(city)}`),
     ]
     return notifyIndexNow(urls)
 }

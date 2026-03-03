@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { toAsciiSlug } from '@/lib/slug-utils'
 
 export const revalidate = 3600 // Regenerate every hour
 
@@ -57,7 +58,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
         // 2. City pages and their service pages
         cities.forEach(cityData => {
-            const citySlug = cityData.city.toLowerCase().replace(/\s+/g, '-')
+            const citySlug = toAsciiSlug(cityData.city)
             const stateSlug = cityData.state_id.toLowerCase()
 
             // City main page

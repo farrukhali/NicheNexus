@@ -8,6 +8,7 @@ import { replacePlaceholders } from '@/lib/seo-utils'
 import { getSEOContent } from '@/lib/seo-content'
 import { Metadata } from 'next'
 import HomepageSchema from '@/components/seo/HomepageSchema'
+import { toAsciiSlug } from '@/lib/slug-utils'
 
 export const revalidate = 60 // Refresh content every minute
 
@@ -175,7 +176,7 @@ export default async function Home() {
               {featuredCities.map((c) => (
                 <Link
                   key={`${c.state_id}-${c.city}`}
-                  href={`/${c.state_id.toLowerCase()}/${c.city.toLowerCase().replace(/\s+/g, '-')}`}
+                  href={`/${c.state_id.toLowerCase()}/${toAsciiSlug(c.city)}`}
                   className="group p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
                 >
                   <span className="font-semibold text-slate-800 group-hover:text-blue-700 text-sm block">{c.city}</span>

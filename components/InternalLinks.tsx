@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
+import { toAsciiSlug } from '@/lib/slug-utils'
 
 interface InternalLinksProps {
     currentCity: string
@@ -34,7 +35,7 @@ export default async function InternalLinks({ currentCity, stateCode, relatedCit
                         </h3>
                         <ul className="space-y-2">
                             {nearbyLinks.map((city, i) => {
-                                const citySlug = city.city.toLowerCase().replace(/\s+/g, '-')
+                                const citySlug = toAsciiSlug(city.city)
                                 return (
                                     <li key={i}>
                                         <Link
@@ -57,7 +58,7 @@ export default async function InternalLinks({ currentCity, stateCode, relatedCit
                             </h3>
                             <ul className="space-y-2">
                                 {moreLinks.map((city, i) => {
-                                    const citySlug = city.city.toLowerCase().replace(/\s+/g, '-')
+                                    const citySlug = toAsciiSlug(city.city)
                                     return (
                                         <li key={i}>
                                             <Link

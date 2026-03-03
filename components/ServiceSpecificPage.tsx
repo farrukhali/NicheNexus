@@ -16,6 +16,7 @@ import LocalBusinessSchema from '@/components/seo/LocalBusinessSchema'
 import { getNeighborhoods } from '@/lib/data-fetching'
 import NeighborhoodSection from '@/components/NeighborhoodSection'
 import LocalReviews from '@/components/LocalReviews'
+import { toAsciiSlug } from '@/lib/slug-utils'
 
 interface ServiceSpecificPageProps {
     city: string
@@ -433,7 +434,7 @@ export default async function ServiceSpecificPage({ city, state, stateCode, serv
                             {relatedCities.map((cityData, i) => (
                                 <Link
                                     key={i}
-                                    href={`/${cityData.state_id.toLowerCase()}/${cityData.city.toLowerCase().replace(/ /g, '-')}/${service.slug}`}
+                                    href={`/${cityData.state_id.toLowerCase()}/${toAsciiSlug(cityData.city)}/${service.slug}`}
                                     className="block p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all text-center text-slate-700 font-medium truncate"
                                     title={`${extendedContent.title} in ${cityData.city}`}
                                 >

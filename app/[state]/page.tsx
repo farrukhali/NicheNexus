@@ -10,6 +10,7 @@ import { getSiteConfig } from '@/lib/site-config'
 import { getNicheConfig } from '@/lib/niche-configs'
 import { replacePlaceholders } from '@/lib/seo-utils'
 import { getSEOContent } from '@/lib/seo-content'
+import { toAsciiSlug } from '@/lib/slug-utils'
 
 export const revalidate = 60 // Refresh content every minute
 
@@ -162,7 +163,7 @@ export default async function StatePage(props: StatePageProps) {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {cities.map((city, index) => {
-                            const citySlug = city.city.trim().toLowerCase().replace(/\s+/g, '-')
+                            const citySlug = toAsciiSlug(city.city)
                             const primaryZip = city.zips ? city.zips.split(' ')[0] : ''
 
                             return (

@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import Footer from '@/components/Footer'
 import { getSiteConfig } from '@/lib/site-config'
 import { Metadata } from 'next'
+import { toAsciiSlug } from '@/lib/slug-utils'
 
 export const revalidate = 3600 // Cache for 1 hour
 
@@ -137,7 +138,7 @@ export default async function SitemapPage() {
                                         {groupedCities[letter].map((city, i) => (
                                             <Link
                                                 key={i}
-                                                href={`/${city.state_id.toLowerCase()}/${city.city.toLowerCase().replace(/\s+/g, '-')}`}
+                                                href={`/${city.state_id.toLowerCase()}/${toAsciiSlug(city.city)}`}
                                                 className="block py-1.5 text-sm text-slate-600 hover:text-blue-600 hover:font-medium break-inside-avoid"
                                             >
                                                 {city.city}, <span className="text-slate-400 text-xs">{city.state_id}</span>
