@@ -14,7 +14,29 @@ export function proxy(request: NextRequest) {
         return NextResponse.next()
     }
 
-    // Check if the path contains uppercase characters
+    // Decode the pathname to get the actual characters (browsers send percent-encoded)
+    let decoded: string
+    try {
+        decoded = decodeURIComponent(pathname)
+    } catch {
+        return NextResponse.next()
+    }
+
+    // Strip diacritics from non-ASCII characters
+    // e.g. /pr/mariano-colón/... → /pr/mariano-colon/...
+    if (!/^[\x00-\x7F]*$/.test(decoded)) {
+        const normalized = decoded
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+
+        if (normalized !== decoded) {
+            const url = request.nextUrl.clone()
+            url.pathname = normalized
+            return NextResponse.redirect(url, 301)
+        }
+    }
+
+    // Redirect uppercase paths to lowercase
     if (pathname !== pathname.toLowerCase()) {
         const url = request.nextUrl.clone()
         url.pathname = pathname.toLowerCase()
@@ -26,13 +48,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next (Next.js internals)
-         * - static (static files)
-         * - all files with extensions (e.g. favicon.ico)
-         */
-        '/((?!api|_next|static|[\\w-]+\\.\\w+).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
     ],
 }
